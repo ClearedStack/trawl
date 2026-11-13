@@ -1,0 +1,45 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a00b/a.pdf",
+        "sha256": "009ce4208169cadf340d548de15ab119b8e02960cdf875c360e3bddc90095704",
+        "kind": "attachment",
+        "title": "Made-up notice: the good one",
+        "via": "sam-gov:0000000000000000000000000000a00b"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "93a7eec62bcf"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "00f97077be98"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "75101adf28c6"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "9cb27303dce0"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "d59c92cb47b0"
+      }
+    ]
+  }
+}

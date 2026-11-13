@@ -1,0 +1,9 @@
+# sam-gov handles a page of public notices in the JSON form of the SAM.gov
+# opportunities search, version 2. The page may arrive inline or be read
+# from an address that needs no key.
+tool: sam-gov
+match:
+  source: sam-gov
+  formats:
+    - sam-gov.opportunities.v2
+input: either

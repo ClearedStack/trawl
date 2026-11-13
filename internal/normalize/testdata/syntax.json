@@ -1,0 +1,87 @@
+[
+  {
+    "name": "empty",
+    "input": "",
+    "error": "E_PARSE reason=empty fp=e3b0c44298fc"
+  },
+  {
+    "name": "only whitespace",
+    "input": " \t\n",
+    "error": "E_PARSE reason=empty fp=7d7713ab8ff9"
+  },
+  {
+    "name": "no scheme",
+    "input": "tools.agency-example.gov/wage",
+    "error": "E_PARSE reason=no_scheme fp=fcfba031688f"
+  },
+  {
+    "name": "scheme without slashes",
+    "input": "https:tools.agency-example.gov",
+    "error": "E_PARSE reason=no_scheme fp=320143e24da9"
+  },
+  {
+    "name": "scheme-like text later in the line",
+    "input": "tools.agency-example.gov/go?to=https://example.org/",
+    "error": "E_PARSE reason=no_scheme fp=b1c7c1bc46a7"
+  },
+  {
+    "name": "no host",
+    "input": "https:///wage",
+    "error": "E_PARSE reason=no_host fp=3367b7be29cc"
+  },
+  {
+    "name": "control character",
+    "input": "https://tools.agency-example.gov/wa\u0007ge",
+    "error": "E_PARSE reason=control_char fp=b50dbf4d29ec"
+  },
+  {
+    "name": "backslash",
+    "input": "https://tools.agency-example.gov\\wage",
+    "error": "E_PARSE reason=backslash fp=6dc174614c74"
+  },
+  {
+    "name": "port is not a number",
+    "input": "https://tools.agency-example.gov:44a/",
+    "error": "E_PARSE reason=bad_port fp=e511531076b7"
+  },
+  {
+    "name": "port zero",
+    "input": "https://tools.agency-example.gov:0/",
+    "error": "E_PARSE reason=bad_port fp=a312bab2dcf4"
+  },
+  {
+    "name": "port too large",
+    "input": "https://tools.agency-example.gov:65536/",
+    "error": "E_PARSE reason=bad_port fp=5907fc41bae7"
+  },
+  {
+    "name": "escape cut short",
+    "input": "https://tools.agency-example.gov/wage%2",
+    "error": "E_PARSE reason=bad_escape fp=f6846ed2825d"
+  },
+  {
+    "name": "escape with bad digits",
+    "input": "https://tools.agency-example.gov/wage%zz",
+    "error": "E_PARSE reason=bad_escape fp=9df4d9c92127"
+  },
+  {
+    "name": "underscore in host",
+    "input": "https://tools_one.agency-example.gov/",
+    "error": "E_PARSE reason=bad_host fp=07e3e0d0e7a3"
+  },
+  {
+    "name": "label starts with hyphen",
+    "input": "https://-tools.agency-example.gov/",
+    "error": "E_PARSE reason=bad_host fp=44e0737a72d9"
+  },
+  {
+    "name": "empty label",
+    "input": "https://tools..agency-example.gov/",
+    "error": "E_PARSE reason=bad_host fp=91e0ea9ced88"
+  },
+  {
+    "name": "too long",
+    "input": "https://tools.agency-example.gov/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "error": "E_PARSE reason=too_long fp=812e5d00e5fb"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "number": 15,
+  "title": "Paperwork suggestion",
+  "labels": [
+    {
+      "name": "paperwork-suggestion"
+    },
+    {
+      "name": "good first issue"
+    }
+  ],
+  "body": "### Document address\n\nhttps://forms.agency-example.gov/library/form-000.pdf\n\n### Document name\n\nMade-up form 000\n\n### What it is for\n\nNeeded before a made-up award.\n"
+}

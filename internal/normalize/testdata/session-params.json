@@ -1,0 +1,71 @@
+[
+  {
+    "name": "jsessionid in query",
+    "input": "https://tools.agency-example.gov/wage?jsessionid=0A1B2C3D",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "PHPSESSID in query",
+    "input": "https://tools.agency-example.gov/wage?PHPSESSID=abc123&state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "sessionid, session_id and sessid",
+    "input": "https://tools.agency-example.gov/wage?sessionid=1&session_id=2&sessid=3&state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "jsessionid in path",
+    "input": "https://tools.agency-example.gov/wage;jsessionid=0A1B2C3D",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "jsessionid in path before query",
+    "input": "https://tools.agency-example.gov/wage;JSESSIONID=0A1B2C3D?state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "jsessionid in a middle segment",
+    "input": "https://tools.agency-example.gov/app;jsessionid=0A1B/wage",
+    "url": "https://tools.agency-example.gov/app/wage",
+    "sha256": "a3ea6eacda58221948876953660f4141f1a110e84c6363bdbf97f2bd24ea8163",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "other path parameter is kept",
+    "input": "https://tools.agency-example.gov/wage;v=2;jsessionid=0A1B",
+    "url": "https://tools.agency-example.gov/wage;v=2",
+    "sha256": "340cb079ef8a606bd3f97b5a582a02ec3e6258d15614ba9acddd0646ade2c012",
+    "applied": [
+      "session-params"
+    ]
+  },
+  {
+    "name": "sid is kept",
+    "input": "https://tools.agency-example.gov/notice?sid=N-0000",
+    "url": "https://tools.agency-example.gov/notice?sid=N-0000",
+    "sha256": "b4950b681ef82398bd5ee11f174dae0b49a5812b45c9ea6de46049e8072ca8ed"
+  }
+]

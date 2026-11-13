@@ -1,0 +1,8 @@
+{
+  "item_id": "notices-page-read-from-an-address",
+  "source": "sam-gov",
+  "format": "sam-gov.opportunities.v2",
+  "url": "https://feed.agency-example.gov/opportunities/v2/search?limit=10",
+  "content_type": "application/json",
+  "observed_at": "2031-03-04T05:06:07Z"
+}

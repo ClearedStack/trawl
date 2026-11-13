@@ -1,0 +1,13 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://example.org/tool",
+        "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a",
+        "kind": "link",
+        "title": "Made-up notice title",
+        "via": "sam-gov:0000000000000000000000000000a010"
+      }
+    ]
+  }
+}

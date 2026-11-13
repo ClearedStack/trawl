@@ -1,0 +1,39 @@
+[
+  {
+    "name": "no path",
+    "input": "https://tools.agency-example.gov",
+    "url": "https://tools.agency-example.gov/",
+    "sha256": "a49185f2b0d8b7bed90f1d092eab65c5d007a1a1ec20b5b3bede8d42febbd422",
+    "applied": [
+      "root-path"
+    ]
+  },
+  {
+    "name": "no path with query",
+    "input": "https://tools.agency-example.gov?state=va",
+    "url": "https://tools.agency-example.gov/?state=va",
+    "sha256": "fac230f682e398d99b8a4ba4abfca7d372379454cdcf9a7b8be4cbec3297b632",
+    "applied": [
+      "root-path"
+    ]
+  },
+  {
+    "name": "no path with fragment",
+    "input": "https://tools.agency-example.gov#top",
+    "url": "https://tools.agency-example.gov/",
+    "sha256": "a49185f2b0d8b7bed90f1d092eab65c5d007a1a1ec20b5b3bede8d42febbd422",
+    "applied": [
+      "fragment",
+      "root-path"
+    ]
+  },
+  {
+    "name": "no path with port",
+    "input": "https://tools.agency-example.gov:8443",
+    "url": "https://tools.agency-example.gov:8443/",
+    "sha256": "d40ffc4be1b45ee6f0fcbe95fe2fcdc45e0751571d51cb5f62a2ddac1a2df639",
+    "applied": [
+      "root-path"
+    ]
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://tools.agency-example.gov/checklist",
+        "sha256": "a5977fd7263cceb27efa136a06b5de61e44e81e5b0cb1e46d91f9a1c0a7a4fbe",
+        "kind": "link",
+        "title": "Public checklist",
+        "via": "https://www.agency-example.gov/intranet-links"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "18896474deb6"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "2791d18093aa"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "82e6293f483f"
+      }
+    ]
+  }
+}

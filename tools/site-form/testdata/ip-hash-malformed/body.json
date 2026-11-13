@@ -1,0 +1,8 @@
+{
+  "kind": "candidate",
+  "url": "https://Tools.Agency-Example.gov/wage/?utm_source=newsletter",
+  "title": "Wage calculator",
+  "website": "",
+  "pow": {"challenge": "made-up-challenge-01", "nonce": "45729"},
+  "ip_hash": "192.0.2.7"
+}

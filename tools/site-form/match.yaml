@@ -1,0 +1,9 @@
+# site-form handles submissions made through the form on clearedstack.com:
+# a candidate address, or a proposed edit to one field of a record.
+# A submission always arrives inline. This sub-tool never reads an address.
+tool: site-form
+match:
+  source: site-form
+  formats:
+    - site-form.v1
+input: inline

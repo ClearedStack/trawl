@@ -1,0 +1,7 @@
+[
+  { "source": "web-sweep", "format": "web-sweep.page.v1", "match": true },
+  { "source": "web-sweep", "format": "web-sweep.page.v2", "match": false },
+  { "source": "web-sweep", "format": "text/html", "match": false },
+  { "source": "sweep", "format": "web-sweep.page.v1", "match": false },
+  { "source": "sam-gov", "format": "web-sweep.page.v1", "match": false }
+]

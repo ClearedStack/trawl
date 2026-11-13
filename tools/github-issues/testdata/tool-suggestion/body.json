@@ -1,0 +1,10 @@
+{
+  "number": 12,
+  "title": "Tool suggestion",
+  "labels": [
+    {
+      "name": "tool-suggestion"
+    }
+  ],
+  "body": "### Tool address\n\nhttps://Tools.Agency-Example.gov/wage/?utm_source=newsletter\n\n### Tool name\n\nWage calculator\n\n### What it does\n\nWorks out a made-up wage floor.\n"
+}

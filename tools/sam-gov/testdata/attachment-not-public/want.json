@@ -1,0 +1,27 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a00c/c.pdf",
+        "sha256": "b91537df9e9d58c2b77a198615899f49c0d24ed3d77d420550465c9cf1f2193c",
+        "kind": "attachment",
+        "title": "Made-up notice: private attachment",
+        "via": "sam-gov:0000000000000000000000000000a00c"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "host_not_public",
+        "fingerprint": "8b39a0cb3a93"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "scheme_not_public",
+        "fingerprint": "11c303d63558"
+      }
+    ]
+  }
+}
