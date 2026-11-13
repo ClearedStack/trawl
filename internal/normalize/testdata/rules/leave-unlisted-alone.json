@@ -1,0 +1,72 @@
+{
+  "rule": "leave-unlisted-alone",
+  "spec": "Nothing the specification does not list is changed. These examples pin that down.",
+  "cases": [
+    {
+      "name": "default https port",
+      "input": "https://example.org:443/a",
+      "canonical": "https://example.org:443/a",
+      "sha256": "84e86be3a42fd6d0f5829d67a11d09a0edcc233f647c8fe4b45d174e62df8d20"
+    },
+    {
+      "name": "default http port",
+      "input": "http://example.org:80/a",
+      "canonical": "http://example.org:80/a",
+      "sha256": "09f45403c943fddcffb2455ebe59fdb556d3e3ff5930b41c0f6f4941e9553e5d"
+    },
+    {
+      "name": "port with leading zero",
+      "input": "https://example.org:08443/a",
+      "canonical": "https://example.org:08443/a",
+      "sha256": "e31ece8a6bc19af0338e6b5468356a905dc67c84e7195535fb6f0346c94ca606"
+    },
+    {
+      "name": "dot segments",
+      "input": "https://example.org/a/../b/./c",
+      "canonical": "https://example.org/a/../b/./c",
+      "sha256": "4a32dd0e2ac3d48681c273c79e480c9c5345969f37b7be34e0de2d2acabdb641"
+    },
+    {
+      "name": "percent-encoding case",
+      "input": "https://example.org/a%2fb%2Fc",
+      "canonical": "https://example.org/a%2fb%2Fc",
+      "sha256": "1a70733b87462d953aeaa84b9c1bfbb3913011b95da9656e4a82f5448466a719"
+    },
+    {
+      "name": "percent-encoded unreserved character",
+      "input": "https://example.org/%7Euser",
+      "canonical": "https://example.org/%7Euser",
+      "sha256": "56d5d4e77c7e2069fe02653b4ba56c4a810bb1f3399c82b30d8f728deb78e834"
+    },
+    {
+      "name": "non-ASCII path bytes",
+      "input": "https://example.org/café",
+      "canonical": "https://example.org/café",
+      "sha256": "89476344a3b59069eb0134e88ea3279b9cb7912b94730cdf4683efe297cdc15f"
+    },
+    {
+      "name": "www prefix",
+      "input": "https://www.example.org/a",
+      "canonical": "https://www.example.org/a",
+      "sha256": "5fcc169d9cd23de0ff3d0beed3a3c9c6535ffefe96520415f4ea31f2bff91394"
+    },
+    {
+      "name": "path parameter",
+      "input": "https://example.org/a;jsessionid=abc123",
+      "canonical": "https://example.org/a;jsessionid=abc123",
+      "sha256": "37683c1b520fd0bb13d96bfadf5170defd4219e0836ec0bf7428665bcab66a51"
+    },
+    {
+      "name": "parameter order",
+      "input": "https://example.org/a?b=2&a=1",
+      "canonical": "https://example.org/a?b=2&a=1",
+      "sha256": "01c68d700774a9aa03911959291f25cdf6114dd841fb85a1bb6108565e2c4a5c"
+    },
+    {
+      "name": "semicolon-separated parameters",
+      "input": "https://example.org/a?x=1;utm_source=y",
+      "canonical": "https://example.org/a?x=1;utm_source=y",
+      "sha256": "f6196f2e5a5b48dd22da2e55268f01262e9807a30aa339359ce027f7c2aa1399"
+    }
+  ]
+}

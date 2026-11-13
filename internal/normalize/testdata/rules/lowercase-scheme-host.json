@@ -1,0 +1,30 @@
+{
+  "rule": "lowercase-scheme-host",
+  "spec": "Lowercases scheme (https) and hostname.",
+  "cases": [
+    {
+      "name": "scheme and host lowercased, path case kept",
+      "input": "HTTPS://Tools.Example.ORG/Calculators",
+      "canonical": "https://tools.example.org/Calculators",
+      "sha256": "644a70305039c4c548cfad57336f651d3fae7adf06a95aeb53f5140a7ada4f9b"
+    },
+    {
+      "name": "http is lowercased, not upgraded to https",
+      "input": "HtTp://EXAMPLE.com/a",
+      "canonical": "http://example.com/a",
+      "sha256": "5bd48fa66118084cc32779267a31116dc05c70bcbca0f28e990cd58ce10afeae"
+    },
+    {
+      "name": "query case kept",
+      "input": "https://Example.org:8443/Rates?Q=Yes",
+      "canonical": "https://example.org:8443/Rates?Q=Yes",
+      "sha256": "6f409937527433c79c05774e4ceb6d4b7ce7489cf87f7f14e0ecf1b6e08d7e91"
+    },
+    {
+      "name": "already canonical",
+      "input": "https://tools.example.org/calculators",
+      "canonical": "https://tools.example.org/calculators",
+      "sha256": "0a43767a39f87c8fac859493376e5d7ef0ff82a4e5ab65f0af984cd65640307b"
+    }
+  ]
+}

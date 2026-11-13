@@ -1,0 +1,11 @@
+ok	https://tools.example.org/Calculators?id=7	3d1534ddd8f995002325faf3ec4880fcdd92976df2ac096d13511e27d0155ed5	new
+ok	https://tools.example.org/Calculators?id=7	3d1534ddd8f995002325faf3ec4880fcdd92976df2ac096d13511e27d0155ed5	seen
+ok	https://forms.example.net/checklist	108d3767d38e0bee33946976c8dee67deeb22403a7ce2f6357c282dce87ffea4	new
+E_PARSE	empty
+E_PARSE	scheme_not_public
+E_PARSE	host_not_public
+E_PARSE	credentials_present
+E_NEEDS_SUBTOOL	non_ascii_host
+E_PARSE	too_long
+ok	https://forms.example.net/checklist	108d3767d38e0bee33946976c8dee67deeb22403a7ce2f6357c282dce87ffea4	seen
+ok	http://forms.example.net/checklist	01b1c5d9a3da6ac350ddc91ba3ebd33401559236cd31daddcb680d546b434f7b	new

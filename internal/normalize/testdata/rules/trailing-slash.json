@@ -1,0 +1,54 @@
+{
+  "rule": "trailing-slash",
+  "spec": "Removes redundant trailing slashes. The root path is always written as /.",
+  "cases": [
+    {
+      "name": "one trailing slash",
+      "input": "https://example.org/forms/",
+      "canonical": "https://example.org/forms",
+      "sha256": "a7501bb9b4096c2bf14e6d55847333e18baacc8af53478fcab388d541c8f2947"
+    },
+    {
+      "name": "several trailing slashes",
+      "input": "https://example.org/forms///",
+      "canonical": "https://example.org/forms",
+      "sha256": "a7501bb9b4096c2bf14e6d55847333e18baacc8af53478fcab388d541c8f2947"
+    },
+    {
+      "name": "trailing slash before query",
+      "input": "https://example.org/forms/?id=7",
+      "canonical": "https://example.org/forms?id=7",
+      "sha256": "8e64eeacba9639e209f4177d27d6a7245475edaf4fd24a9e367c44bbb329200a"
+    },
+    {
+      "name": "inner double slash is kept",
+      "input": "https://example.org/a//b/",
+      "canonical": "https://example.org/a//b",
+      "sha256": "b3085b30f4ea608b3562b224804dee490a78b5ea85c383e2e38923916a9447cc"
+    },
+    {
+      "name": "root slash is kept",
+      "input": "https://example.org/",
+      "canonical": "https://example.org/",
+      "sha256": "8198d1bac40a1033653a78e48800cefc9e6b974ff075c66e5548b5c1e145a2b0"
+    },
+    {
+      "name": "no path becomes root",
+      "input": "https://example.org",
+      "canonical": "https://example.org/",
+      "sha256": "8198d1bac40a1033653a78e48800cefc9e6b974ff075c66e5548b5c1e145a2b0"
+    },
+    {
+      "name": "several root slashes",
+      "input": "https://example.org///",
+      "canonical": "https://example.org/",
+      "sha256": "8198d1bac40a1033653a78e48800cefc9e6b974ff075c66e5548b5c1e145a2b0"
+    },
+    {
+      "name": "no path with query",
+      "input": "https://example.org?id=7",
+      "canonical": "https://example.org/?id=7",
+      "sha256": "35a778edeb48a3bb4d16168e659f1189154aaed68fc198a8d046b0c5b2590deb"
+    }
+  ]
+}

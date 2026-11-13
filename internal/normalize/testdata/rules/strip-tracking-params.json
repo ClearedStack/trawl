@@ -1,0 +1,84 @@
+{
+  "rule": "strip-tracking-params",
+  "spec": "Strips tracking and session query parameters (utm_*, ref, fbclid, gclid, session IDs).",
+  "cases": [
+    {
+      "name": "all utm parameters",
+      "input": "https://example.org/tool?utm_source=news&utm_medium=email",
+      "canonical": "https://example.org/tool",
+      "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a"
+    },
+    {
+      "name": "utm among others",
+      "input": "https://example.org/tool?id=7&utm_campaign=fall&page=2",
+      "canonical": "https://example.org/tool?id=7&page=2",
+      "sha256": "a6b4d78d6d1d9717d2ee9598ac553ed8099d1fd0537129ce0c0031606d9867f2"
+    },
+    {
+      "name": "ref",
+      "input": "https://example.org/tool?ref=home&id=7",
+      "canonical": "https://example.org/tool?id=7",
+      "sha256": "69f46167bc88db100f2f29a46e871f25d104515616797fafe1eb2e0d88a741df"
+    },
+    {
+      "name": "fbclid and gclid",
+      "input": "https://example.org/tool?fbclid=AbC123&gclid=XyZ789",
+      "canonical": "https://example.org/tool",
+      "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a"
+    },
+    {
+      "name": "names match in any letter case",
+      "input": "https://example.org/tool?UTM_Source=x&REF=y&id=7",
+      "canonical": "https://example.org/tool?id=7",
+      "sha256": "69f46167bc88db100f2f29a46e871f25d104515616797fafe1eb2e0d88a741df"
+    },
+    {
+      "name": "session ids",
+      "input": "https://example.org/tool?PHPSESSID=abc123&jsessionid=def456&sessionid=1&session_id=2&sid=3&q=forms",
+      "canonical": "https://example.org/tool?q=forms",
+      "sha256": "b037fb3b0cc220306bb6a8da0ae4595de2a34133e936006fd296d1098e1502e7"
+    },
+    {
+      "name": "percent-encoded name is decoded before matching",
+      "input": "https://example.org/tool?%75tm_source=x&id=7",
+      "canonical": "https://example.org/tool?id=7",
+      "sha256": "69f46167bc88db100f2f29a46e871f25d104515616797fafe1eb2e0d88a741df"
+    },
+    {
+      "name": "parameter without a value",
+      "input": "https://example.org/tool?ref",
+      "canonical": "https://example.org/tool",
+      "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a"
+    },
+    {
+      "name": "order of kept parameters is unchanged",
+      "input": "https://example.org/tool?b=2&a=1&utm_term=z&a=3",
+      "canonical": "https://example.org/tool?b=2&a=1&a=3",
+      "sha256": "cfb67653e906d5ee39df5c3bc387d27946baae6291517f9649120ac5a28af3d0"
+    },
+    {
+      "name": "kept values are byte for byte",
+      "input": "https://example.org/tool?q=a%20b+c&utm_content=x",
+      "canonical": "https://example.org/tool?q=a%20b+c",
+      "sha256": "5a8ff06a916b266a0a7dbaee22fcfd6f973690fc7b155d1f4132f7a3202881d0"
+    },
+    {
+      "name": "empty pieces are dropped",
+      "input": "https://example.org/tool?&id=7&&",
+      "canonical": "https://example.org/tool?id=7",
+      "sha256": "69f46167bc88db100f2f29a46e871f25d104515616797fafe1eb2e0d88a741df"
+    },
+    {
+      "name": "empty query is dropped",
+      "input": "https://example.org/tool?",
+      "canonical": "https://example.org/tool",
+      "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a"
+    },
+    {
+      "name": "similar names are kept",
+      "input": "https://example.org/tool?reference=12&refresh=1&utm=5&prefer=a&sidebar=1",
+      "canonical": "https://example.org/tool?reference=12&refresh=1&utm=5&prefer=a&sidebar=1",
+      "sha256": "c07dd72697f946eec2f041f8657fb3d49f51a6ea7e5d98d64c1b938f00cfdcd0"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "rule": "public-scheme",
+  "spec": "Enforces public-only scheme validation: http and https, followed by //host.",
+  "cases": [
+    {
+      "name": "https",
+      "input": "https://example.org/tool",
+      "canonical": "https://example.org/tool",
+      "sha256": "8bbaea237f77c077897f93aa14a93b41959d395d5cef040abfd93f62e077cc0a"
+    },
+    {
+      "name": "http",
+      "input": "http://example.org/tool",
+      "canonical": "http://example.org/tool",
+      "sha256": "fd35bdaf4573020edaa4830cd6e142cd06e7367b6bf7e13efa70ed7cf2fab38f"
+    },
+    {
+      "name": "ftp",
+      "input": "ftp://files.example.org/tool.zip",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "file",
+      "input": "file:///tmp/notes.txt",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "mailto",
+      "input": "mailto:someone@example.org",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "javascript",
+      "input": "javascript:alert(1)",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "data",
+      "input": "data:text/plain,hello",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "host and port without scheme reads as a scheme",
+      "input": "example.org:8080/tool",
+      "code": "E_PARSE",
+      "reason": "scheme_not_public"
+    },
+    {
+      "name": "no scheme",
+      "input": "example.org/tool",
+      "code": "E_PARSE",
+      "reason": "missing_scheme"
+    },
+    {
+      "name": "scheme-relative",
+      "input": "//example.org/tool",
+      "code": "E_PARSE",
+      "reason": "missing_scheme"
+    },
+    {
+      "name": "path only",
+      "input": "/tool",
+      "code": "E_PARSE",
+      "reason": "missing_scheme"
+    },
+    {
+      "name": "scheme starting with a digit",
+      "input": "1https://example.org/tool",
+      "code": "E_PARSE",
+      "reason": "missing_scheme"
+    },
+    {
+      "name": "one slash",
+      "input": "https:/example.org/tool",
+      "code": "E_PARSE",
+      "reason": "missing_host"
+    },
+    {
+      "name": "no slashes",
+      "input": "https:example.org",
+      "code": "E_PARSE",
+      "reason": "missing_host"
+    },
+    {
+      "name": "backslashes",
+      "input": "https:\\\\example.org\\tool",
+      "code": "E_PARSE",
+      "reason": "missing_host"
+    },
+    {
+      "name": "empty host",
+      "input": "https:///tool",
+      "code": "E_PARSE",
+      "reason": "missing_host"
+    },
+    {
+      "name": "port without host",
+      "input": "https://:8080/tool",
+      "code": "E_PARSE",
+      "reason": "missing_host"
+    }
+  ]
+}

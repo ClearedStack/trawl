@@ -1,0 +1,120 @@
+{
+  "rule": "default-index",
+  "spec": "Removes default index filenames.",
+  "cases": [
+    {
+      "name": "index.html",
+      "input": "https://example.org/docs/index.html",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index.htm",
+      "input": "https://example.org/docs/index.htm",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index.php",
+      "input": "https://example.org/docs/index.php",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index.asp",
+      "input": "https://example.org/docs/index.asp",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index.aspx",
+      "input": "https://example.org/docs/index.aspx",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index.jsp",
+      "input": "https://example.org/docs/index.jsp",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "default.html",
+      "input": "https://example.org/docs/default.html",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "default.htm",
+      "input": "https://example.org/docs/default.htm",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "default.asp",
+      "input": "https://example.org/docs/default.asp",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "default.aspx",
+      "input": "https://example.org/docs/default.aspx",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "index at root",
+      "input": "https://example.org/index.html",
+      "canonical": "https://example.org/",
+      "sha256": "8198d1bac40a1033653a78e48800cefc9e6b974ff075c66e5548b5c1e145a2b0"
+    },
+    {
+      "name": "index before query",
+      "input": "https://example.org/docs/index.html?id=7",
+      "canonical": "https://example.org/docs?id=7",
+      "sha256": "ec22a26004fe301f2d74f5d8ccb2df9b48a04ea4637a5ed2533c8b29f5a63f0b"
+    },
+    {
+      "name": "index then slash",
+      "input": "https://example.org/docs/index.html/",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "repeated until none is left",
+      "input": "https://example.org/docs/index.html/index.php",
+      "canonical": "https://example.org/docs",
+      "sha256": "5ff2aec7f24e9f907d695246c6461496bd32ca4940ea0b1538e1a99ccacf21a1"
+    },
+    {
+      "name": "other letter case is kept",
+      "input": "https://example.org/docs/Index.HTML",
+      "canonical": "https://example.org/docs/Index.HTML",
+      "sha256": "eca8b35777b55aeff7f27268f495899631d2a30f316638c73a5af0eddb492d61"
+    },
+    {
+      "name": "longer filename is kept",
+      "input": "https://example.org/docs/index.html.bak",
+      "canonical": "https://example.org/docs/index.html.bak",
+      "sha256": "623af068891e08d15b42e59e1a897beee9e5ba7db4019aee1b6b373752b2870d"
+    },
+    {
+      "name": "filename ending in index.html is kept",
+      "input": "https://example.org/docs/myindex.html",
+      "canonical": "https://example.org/docs/myindex.html",
+      "sha256": "cbfd2eb6a41e7534bb9b9fc688b7f663f6ef200fd1fa17e4c22d64ca13dfa2a7"
+    },
+    {
+      "name": "index in the middle is kept",
+      "input": "https://example.org/index.html/form",
+      "canonical": "https://example.org/index.html/form",
+      "sha256": "749998c6a1234d16287dda5e13157d812c1cb46f326d558cf6d0bc456cacb7a5"
+    },
+    {
+      "name": "other extension is kept",
+      "input": "https://example.org/docs/index.txt",
+      "canonical": "https://example.org/docs/index.txt",
+      "sha256": "d71cbca2401bff66dda77775b220470bf891b7cfb32ca771735d8f9f60eda285"
+    }
+  ]
+}

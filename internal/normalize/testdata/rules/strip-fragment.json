@@ -1,0 +1,36 @@
+{
+  "rule": "strip-fragment",
+  "spec": "Strips # fragments.",
+  "cases": [
+    {
+      "name": "fragment",
+      "input": "https://example.org/guide#section-3",
+      "canonical": "https://example.org/guide",
+      "sha256": "e7d700f44c38e1028e9ab7b2499beadc16c2b587b4b8603f819ce5b49d6f6ccd"
+    },
+    {
+      "name": "fragment after query",
+      "input": "https://example.org/guide?id=7#top",
+      "canonical": "https://example.org/guide?id=7",
+      "sha256": "9ab867366040ed2e7711064e0e9898f55d3853f6061e9b0ec997e24b64934355"
+    },
+    {
+      "name": "empty fragment",
+      "input": "https://example.org/guide#",
+      "canonical": "https://example.org/guide",
+      "sha256": "e7d700f44c38e1028e9ab7b2499beadc16c2b587b4b8603f819ce5b49d6f6ccd"
+    },
+    {
+      "name": "fragment holding a route and a query",
+      "input": "https://example.org/app#/route?utm_source=x",
+      "canonical": "https://example.org/app",
+      "sha256": "10fbde755967ac31c6ca2648a455d14b6eb4146d8a889f93cff6ce0cc40a19b0"
+    },
+    {
+      "name": "fragment straight after host",
+      "input": "https://example.org#top",
+      "canonical": "https://example.org/",
+      "sha256": "8198d1bac40a1033653a78e48800cefc9e6b974ff075c66e5548b5c1e145a2b0"
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "rule": "public-host",
+  "spec": "Enforces public-only host validation: a multi-label DNS name whose last label is not reserved for private use; no IP literals; no credentials.",
+  "cases": [
+    {
+      "name": "ordinary host",
+      "input": "https://tools.example.org/calc",
+      "canonical": "https://tools.example.org/calc",
+      "sha256": "21be24ad1351ea478ec712f0e2f4e8526eb4b5b7a4b95eeb193bd337a053fe8d"
+    },
+    {
+      "name": "punycode host",
+      "input": "https://xn--bcher-kva.example.org/katalog",
+      "canonical": "https://xn--bcher-kva.example.org/katalog",
+      "sha256": "bba619830b186c8e7e6fe6f95ab4065520fe4543d09c136877b00b256f7b1324"
+    },
+    {
+      "name": "host with digits and hyphens",
+      "input": "https://apex-7.example.net/",
+      "canonical": "https://apex-7.example.net/",
+      "sha256": "eab00281c7c1744708ebcaafdb54342aacc6d726cbd2790475d9ba73904ee97c"
+    },
+    {
+      "name": "localhost",
+      "input": "https://localhost/tool",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "single label",
+      "input": "https://intranet/tool",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "loopback IPv4",
+      "input": "https://127.0.0.1/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "private IPv4 with port",
+      "input": "http://10.1.2.3:8080/x",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "documentation IPv4",
+      "input": "https://192.0.2.10/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "IPv4 as one number",
+      "input": "https://2130706433/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "IPv4 in hex",
+      "input": "https://0x7f.0.0.1/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "loopback IPv6",
+      "input": "https://[::1]/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "documentation IPv6",
+      "input": "https://[2001:db8::1]:8443/x",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".internal",
+      "input": "https://tools.internal/x",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".local",
+      "input": "https://printer.local/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "cluster service name",
+      "input": "http://muster.cs-workers.svc.cluster.local/lease",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "short cluster service name",
+      "input": "http://muster.cs-workers.svc/lease",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".test",
+      "input": "https://app.test/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".example",
+      "input": "https://site.example/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".invalid",
+      "input": "https://site.invalid/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".localhost",
+      "input": "https://app.localhost/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".onion",
+      "input": "https://hidden.onion/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".lan",
+      "input": "https://router.lan/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".home",
+      "input": "https://nas.home/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".corp",
+      "input": "https://wiki.corp/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".alt",
+      "input": "https://site.alt/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": ".arpa",
+      "input": "https://router.home.arpa/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "uppercase reserved name",
+      "input": "https://Printer.LOCAL/",
+      "code": "E_PARSE",
+      "reason": "host_not_public"
+    },
+    {
+      "name": "user and password",
+      "input": "https://user:secret@example.org/",
+      "code": "E_PARSE",
+      "reason": "credentials_present"
+    },
+    {
+      "name": "user only",
+      "input": "https://user@example.org/",
+      "code": "E_PARSE",
+      "reason": "credentials_present"
+    },
+    {
+      "name": "backslash before at-sign",
+      "input": "https://example.org\\@example.net/",
+      "code": "E_PARSE",
+      "reason": "credentials_present"
+    },
+    {
+      "name": "underscore",
+      "input": "https://exa_mple.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "leading hyphen",
+      "input": "https://-bad.example.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "trailing hyphen",
+      "input": "https://bad-.example.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "empty label",
+      "input": "https://example..org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "leading dot",
+      "input": "https://.example.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "two trailing dots",
+      "input": "https://example.org../",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "percent-encoded host",
+      "input": "https://exam%70le.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "label of 64 characters",
+      "input": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "host of 253 characters",
+      "input": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.org/",
+      "canonical": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.org/",
+      "sha256": "dba53d021f3a0f596cbce50417c79d072486945646a657c9ec14098faff95aee"
+    },
+    {
+      "name": "host of 254 characters",
+      "input": "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.org/",
+      "code": "E_PARSE",
+      "reason": "bad_host"
+    },
+    {
+      "name": "empty port",
+      "input": "https://example.org:/",
+      "code": "E_PARSE",
+      "reason": "bad_port"
+    },
+    {
+      "name": "port too large",
+      "input": "https://example.org:99999/",
+      "code": "E_PARSE",
+      "reason": "bad_port"
+    },
+    {
+      "name": "port zero",
+      "input": "https://example.org:0/",
+      "code": "E_PARSE",
+      "reason": "bad_port"
+    },
+    {
+      "name": "port with a letter",
+      "input": "https://example.org:8o80/",
+      "code": "E_PARSE",
+      "reason": "bad_port"
+    },
+    {
+      "name": "non-ASCII host has no rule yet",
+      "input": "https://bücher.example.org/",
+      "code": "E_NEEDS_SUBTOOL",
+      "reason": "non_ascii_host"
+    },
+    {
+      "name": "trailing-dot host has no rule yet",
+      "input": "https://example.org./tool",
+      "code": "E_NEEDS_SUBTOOL",
+      "reason": "trailing_dot_host"
+    }
+  ]
+}
