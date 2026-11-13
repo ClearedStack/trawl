@@ -1,0 +1,53 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://calc.depot-example.mil/rates",
+        "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
+        "kind": "tool",
+        "title": "Rate table",
+        "via": "github-issues#21"
+      },
+      {
+        "url": "https://forms.agency-example.gov/library",
+        "sha256": "368debbe0a1c4551c42735b8f3c0f8330dfb422cd3df6c437d668a85b1602023",
+        "kind": "paperwork",
+        "title": "Forms library",
+        "via": "github-issues#26"
+      },
+      {
+        "url": "https://calc.depot-example.mil/rates",
+        "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
+        "kind": "tool",
+        "title": "Rate table again",
+        "via": "github-issues#27"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "no_address",
+        "fingerprint": "bcad3c0244fa"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "bad_issue",
+        "fingerprint": "a97dd3634d80"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "bad_issue",
+        "fingerprint": "d7c0c1e45d1a"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "no_body",
+        "fingerprint": "83dac70fc011"
+      }
+    ]
+  }
+}

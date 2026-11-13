@@ -1,0 +1,9 @@
+{
+  "number": 42,
+  "labels": [
+    {
+      "name": "tool-suggestion"
+    }
+  ],
+  "body": "### Tool name\n\nWage calculator\n"
+}

@@ -1,0 +1,13 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://tools.agency-example.gov/wage",
+        "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+        "kind": "tool",
+        "title": "Wage calculator",
+        "via": "github-issues#31"
+      }
+    ]
+  }
+}
