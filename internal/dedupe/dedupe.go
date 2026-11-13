@@ -44,11 +44,11 @@ func ParseID(id string) (int, bool) {
 
 // Entry is one canonical address waiting for a decision.
 type Entry struct {
-	URL    string
-	SHA256 string
-	Kind   string
-	Title  string
-	Via    string
+	URL    string `json:"url"`
+	SHA256 string `json:"sha256"`
+	Kind   string `json:"kind,omitempty"`
+	Title  string `json:"title,omitempty"`
+	Via    string `json:"via,omitempty"`
 }
 
 // Record is a new address with the identifier minted for it.
