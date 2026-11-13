@@ -13,6 +13,7 @@ import (
 	githubissues "github.com/ClearedStack/trawl/tools/github-issues"
 	samgov "github.com/ClearedStack/trawl/tools/sam-gov"
 	siteform "github.com/ClearedStack/trawl/tools/site-form"
+	websweep "github.com/ClearedStack/trawl/tools/web-sweep"
 )
 
 //go:embed registry.yaml */match.yaml
@@ -23,6 +24,7 @@ var logic = map[string]func() tool.Tool{
 	githubissues.Name: githubissues.New,
 	samgov.Name:       samgov.New,
 	siteform.Name:     siteform.New,
+	websweep.Name:     websweep.New,
 }
 
 // Load reads the registry and every listed sub-tool's matching rule, and

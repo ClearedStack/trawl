@@ -1,0 +1,27 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://tools.agency-example.gov/wage-calculator",
+        "sha256": "12223427bd1941faadbbc48992a2323ff6732fcc4f9fbcc6392087a30968b70a",
+        "kind": "link",
+        "title": "Wage calculator",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "url": "https://tools.agency-example.gov/templates",
+        "sha256": "541b32bc6fb0bfd25eda31b9b74f4fc3bd8cdd1417b8b83d676c0e0da38e4cac",
+        "kind": "link",
+        "title": "Templates",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "url": "https://tools.agency-example.gov/catalog?page=2",
+        "sha256": "442f72d171b7090e373d4526c2970a12199cebd07e3c81ca79ebeeb0a9fd56b5",
+        "kind": "link",
+        "title": "More tools",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    ]
+  }
+}

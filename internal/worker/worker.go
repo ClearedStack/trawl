@@ -13,6 +13,7 @@ import (
 
 	"github.com/ClearedStack/trawl/internal/dedupe"
 	"github.com/ClearedStack/trawl/internal/errs"
+	"github.com/ClearedStack/trawl/internal/fetch"
 	"github.com/ClearedStack/trawl/internal/intake"
 	"github.com/ClearedStack/trawl/internal/muster"
 	"github.com/ClearedStack/trawl/internal/spool"
@@ -20,16 +21,11 @@ import (
 )
 
 // Document is something read from a public address.
-type Document struct {
-	// URL is the canonical address the document was finally read from.
-	URL         string
-	ContentType string
-	Body        []byte
-}
+type Document = fetch.Document
 
 // ErrRobotsDisallowed is returned by a Fetcher when the site's robots.txt
 // does not allow the address to be read.
-var ErrRobotsDisallowed = errors.New("robots.txt does not allow this address")
+var ErrRobotsDisallowed = fetch.ErrRobotsDisallowed
 
 // Fetcher reads public addresses. Apart from ErrRobotsDisallowed, the
 // errors it returns are public errors.

@@ -1,0 +1,21 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://www.agency-example.gov/library/worksheet-b",
+        "sha256": "fddaa6056a7860fef303a36a639022d4fe4790d4ac39964c16ad09cc59cebd62",
+        "kind": "link",
+        "title": "Guide to CUI marking worksheet",
+        "via": "https://www.agency-example.gov/library"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "controlled_marking",
+        "fingerprint": "b371392397e1"
+      }
+    ]
+  }
+}
