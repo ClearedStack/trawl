@@ -1,0 +1,74 @@
+[
+  {
+    "name": "utm parameters",
+    "input": "https://tools.agency-example.gov/wage?utm_source=news&utm_medium=email&utm_campaign=spring",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "any utm_ name",
+    "input": "https://tools.agency-example.gov/wage?utm_made_up=1",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "ref",
+    "input": "https://tools.agency-example.gov/wage?ref=homepage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "fbclid and gclid",
+    "input": "https://tools.agency-example.gov/wage?fbclid=abc&gclid=def",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "upper case name",
+    "input": "https://tools.agency-example.gov/wage?UTM_Source=news",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "escaped name",
+    "input": "https://tools.agency-example.gov/wage?%75tm_source=news",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "mixed with kept parameters",
+    "input": "https://tools.agency-example.gov/wage?state=va&utm_source=news&year=2031",
+    "url": "https://tools.agency-example.gov/wage?state=va&year=2031",
+    "sha256": "b9c699799210c6b6f9a953b39c03696e3114d1faa8eff3c33616ed5ac0266238",
+    "applied": [
+      "tracking-params"
+    ]
+  },
+  {
+    "name": "similar names are kept",
+    "input": "https://tools.agency-example.gov/wage?reference=7&utmost=1&refer=2",
+    "url": "https://tools.agency-example.gov/wage?refer=2&reference=7&utmost=1",
+    "sha256": "d0b4a2839dd1c9cf7ffeeb31757f79065d18009a95520d01ed5d5693f217d67c",
+    "applied": [
+      "query-order"
+    ]
+  }
+]

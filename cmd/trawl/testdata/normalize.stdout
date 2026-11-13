@@ -1,0 +1,30 @@
+url     https://tools.agency-example.gov/wage
+sha256  4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d
+seen    no
+id      PA-0001
+
+url     https://tools.agency-example.gov/wage
+sha256  4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d
+seen    yes
+id      PA-0001
+
+url     http://calc.depot-example.mil/rates?area=7&year=2031
+sha256  8d95fd51d03fb2f441d26fed2de94106e0b9b91331479a1a6d4c3458a696fc02
+seen    no
+id      PA-0002
+
+error   E_PARSE reason=scheme_not_public fp=5b2d891ca66b
+
+url     https://tools.agency-example.gov/wage
+sha256  4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d
+seen    yes
+id      PA-0001
+
+error   E_NEEDS_SUBTOOL reason=idn_host fp=44ec8b606b55
+
+error   E_PARSE reason=host_not_public fp=0ea70552d0f7
+
+url     https://calc.depot-example.mil/rates?area=7&year=2031
+sha256  ebf04175d74a977d9f9130c3851e2a546fd91075f7a043f5d814edb7bffe94de
+seen    no
+id      PA-0003

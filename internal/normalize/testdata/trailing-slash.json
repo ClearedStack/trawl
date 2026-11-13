@@ -1,0 +1,50 @@
+[
+  {
+    "name": "one slash",
+    "input": "https://tools.agency-example.gov/wage/",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "several slashes",
+    "input": "https://tools.agency-example.gov/wage///",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "slash before query",
+    "input": "https://tools.agency-example.gov/wage/?state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "only slashes",
+    "input": "https://tools.agency-example.gov///",
+    "url": "https://tools.agency-example.gov/",
+    "sha256": "a49185f2b0d8b7bed90f1d092eab65c5d007a1a1ec20b5b3bede8d42febbd422",
+    "applied": [
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "root slash is kept",
+    "input": "https://tools.agency-example.gov/",
+    "url": "https://tools.agency-example.gov/",
+    "sha256": "a49185f2b0d8b7bed90f1d092eab65c5d007a1a1ec20b5b3bede8d42febbd422"
+  },
+  {
+    "name": "inner double slash is kept",
+    "input": "https://tools.agency-example.gov/a//b",
+    "url": "https://tools.agency-example.gov/a//b",
+    "sha256": "d7c6a45399dd933451c1b3f4d0477e1985694499d796d7f348417fffef64ec0b"
+  }
+]

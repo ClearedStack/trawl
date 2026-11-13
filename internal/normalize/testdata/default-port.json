@@ -1,0 +1,50 @@
+[
+  {
+    "name": "https 443",
+    "input": "https://tools.agency-example.gov:443/wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "default-port"
+    ]
+  },
+  {
+    "name": "http 80",
+    "input": "http://tools.agency-example.gov:80/wage",
+    "url": "http://tools.agency-example.gov/wage",
+    "sha256": "4707a288b290b2b7de0ce215fa37adb85e2d90b8b57b73cfce7441b4f8025ddf",
+    "applied": [
+      "default-port"
+    ]
+  },
+  {
+    "name": "empty port",
+    "input": "https://tools.agency-example.gov:/wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "default-port"
+    ]
+  },
+  {
+    "name": "leading zeros",
+    "input": "https://tools.agency-example.gov:08443/wage",
+    "url": "https://tools.agency-example.gov:8443/wage",
+    "sha256": "0cedb1c3ea71bdbc5b37b9b3159fd3425c21c0a0ec97a6d8bef4a55d73852cf9",
+    "applied": [
+      "default-port"
+    ]
+  },
+  {
+    "name": "other port is kept",
+    "input": "https://tools.agency-example.gov:8443/wage",
+    "url": "https://tools.agency-example.gov:8443/wage",
+    "sha256": "0cedb1c3ea71bdbc5b37b9b3159fd3425c21c0a0ec97a6d8bef4a55d73852cf9"
+  },
+  {
+    "name": "443 on http is kept",
+    "input": "http://tools.agency-example.gov:443/wage",
+    "url": "http://tools.agency-example.gov:443/wage",
+    "sha256": "613686898ff748e4460c1aac07201fe3e44aa835ab976a0f5fb25f989caa9640"
+  }
+]

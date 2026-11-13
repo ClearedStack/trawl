@@ -1,0 +1,139 @@
+[
+  {
+    "name": "index.html",
+    "input": "https://tools.agency-example.gov/wage/index.html",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index.htm at the root",
+    "input": "https://tools.agency-example.gov/index.htm",
+    "url": "https://tools.agency-example.gov/",
+    "sha256": "a49185f2b0d8b7bed90f1d092eab65c5d007a1a1ec20b5b3bede8d42febbd422",
+    "applied": [
+      "default-index"
+    ]
+  },
+  {
+    "name": "index.php with a query",
+    "input": "https://tools.agency-example.gov/wage/index.php?state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "Default.aspx",
+    "input": "https://tools.agency-example.gov/wage/Default.aspx",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index.jsp",
+    "input": "https://tools.agency-example.gov/a/index.jsp",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index.asp",
+    "input": "https://tools.agency-example.gov/a/index.asp",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index.shtml",
+    "input": "https://tools.agency-example.gov/a/index.shtml",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index.aspx",
+    "input": "https://tools.agency-example.gov/a/index.aspx",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "default.htm",
+    "input": "https://tools.agency-example.gov/a/default.htm",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "default.html",
+    "input": "https://tools.agency-example.gov/a/default.html",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "default.asp",
+    "input": "https://tools.agency-example.gov/a/default.asp",
+    "url": "https://tools.agency-example.gov/a",
+    "sha256": "0a0e367ea477b6d2ae67e52a09e3ac4e05b109c50ab5c65a67cea3596a2612c3",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index name followed by a slash",
+    "input": "https://tools.agency-example.gov/wage/index.html/",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "default-index",
+      "trailing-slash"
+    ]
+  },
+  {
+    "name": "index name in the middle is kept",
+    "input": "https://tools.agency-example.gov/index.html/wage",
+    "url": "https://tools.agency-example.gov/index.html/wage",
+    "sha256": "463d027ea8c9b67c60dbe1e29bf6e71271d5deeeeed7d344b8e7bd5af854ae3f"
+  },
+  {
+    "name": "other filename is kept",
+    "input": "https://tools.agency-example.gov/wage/home.html",
+    "url": "https://tools.agency-example.gov/wage/home.html",
+    "sha256": "fa1c69b3d39c764524273cce9db8b5ddcc8c6b72ebe13e55b46a02d6cb0cb128"
+  },
+  {
+    "name": "longer name is kept",
+    "input": "https://tools.agency-example.gov/wage/myindex.html",
+    "url": "https://tools.agency-example.gov/wage/myindex.html",
+    "sha256": "8d007ee8d6c3365793f0bbef5e11c154e33b52bda4b6997fab6a4ec6b6e02d8c"
+  }
+]
