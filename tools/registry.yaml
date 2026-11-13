@@ -2,5 +2,6 @@
 # (match.yaml), the logic (Go) and fixtures (testdata/).
 contract: v1
 tools:
+  - sam-gov
   - github-issues
   - site-form

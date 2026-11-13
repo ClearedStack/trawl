@@ -11,6 +11,7 @@ import (
 	"github.com/ClearedStack/trawl/internal/muster"
 	"github.com/ClearedStack/trawl/internal/tool"
 	githubissues "github.com/ClearedStack/trawl/tools/github-issues"
+	samgov "github.com/ClearedStack/trawl/tools/sam-gov"
 	siteform "github.com/ClearedStack/trawl/tools/site-form"
 )
 
@@ -20,6 +21,7 @@ var files embed.FS
 // logic maps a folder name to the constructor of its logic.
 var logic = map[string]func() tool.Tool{
 	githubissues.Name: githubissues.New,
+	samgov.Name:       samgov.New,
 	siteform.Name:     siteform.New,
 }
 

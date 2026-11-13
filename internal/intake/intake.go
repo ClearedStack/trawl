@@ -14,7 +14,7 @@ import (
 
 const (
 	// MaxCandidates is the most addresses one item may yield.
-	MaxCandidates = 500
+	MaxCandidates = 2000
 	// MaxTitle and MaxVia bound the text kept with a candidate.
 	MaxTitle = 120
 	MaxVia   = 200

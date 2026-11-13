@@ -1,0 +1,22 @@
+{
+  "totalRecords": 3,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "noticeId": "0000000000000000000000000000a005"
+    },
+    {
+      "noticeId": "0000000000000000000000000000a006",
+      "title": null,
+      "additionalInfoLink": null,
+      "resourceLinks": null,
+      "description": null
+    },
+    {
+      "noticeId": "0000000000000000000000000000a007",
+      "additionalInfoLink": "  ",
+      "resourceLinks": []
+    }
+  ]
+}

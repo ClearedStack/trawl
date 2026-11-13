@@ -1,0 +1,41 @@
+{
+  "totalRecords": 6,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "title": "Made-up notice with no id",
+      "resourceLinks": [
+        "https://notices.agency-example.gov/files/0000000000000000000000000000a008/a.pdf"
+      ]
+    },
+    {
+      "noticeId": "0000000000000000000000000000a009",
+      "title": "Made-up notice: links are not a list",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a009/view",
+      "resourceLinks": "https://example.org/a.pdf"
+    },
+    {
+      "noticeId": "0000000000000000000000000000a00a",
+      "title": "Made-up notice: a link is not text",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a00a/view",
+      "resourceLinks": [
+        "https://notices.agency-example.gov/files/0000000000000000000000000000a00a/a.pdf",
+        7
+      ]
+    },
+    {
+      "noticeId": "not a valid id!",
+      "title": "Made-up"
+    },
+    "not a notice",
+    {
+      "noticeId": "0000000000000000000000000000a00b",
+      "title": "Made-up notice: the good one",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a00b/view",
+      "resourceLinks": [
+        "https://notices.agency-example.gov/files/0000000000000000000000000000a00b/a.pdf"
+      ]
+    }
+  ]
+}

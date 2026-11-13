@@ -1,0 +1,19 @@
+{
+  "totalRecords": 2,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "noticeId": "0000000000000000000000000000a00d",
+      "title": "Made-up notice: marked text",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a00d/view",
+      "description": "CUI//SP-PROCURE made-up paragraph with https://example.org/should-not-be-kept"
+    },
+    {
+      "noticeId": "0000000000000000000000000000a00e",
+      "title": "Made-up notice: clean",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a00e/view",
+      "additionalInfoLink": "https://example.org/kept"
+    }
+  ]
+}

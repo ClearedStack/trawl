@@ -1,0 +1,27 @@
+[
+  {
+    "source": "sam-gov",
+    "format": "sam-gov.opportunities.v2",
+    "match": true
+  },
+  {
+    "source": "sam-gov",
+    "format": "sam-gov.opportunities.v1",
+    "match": false
+  },
+  {
+    "source": "sam-gov",
+    "format": "sam-gov.entities.v2",
+    "match": false
+  },
+  {
+    "source": "sam.gov",
+    "format": "sam-gov.opportunities.v2",
+    "match": false
+  },
+  {
+    "source": "web-sweep",
+    "format": "sam-gov.opportunities.v2",
+    "match": false
+  }
+]

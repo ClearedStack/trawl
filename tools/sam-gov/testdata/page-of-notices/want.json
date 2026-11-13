@@ -1,0 +1,41 @@
+{
+  "result": {
+    "entries": [
+      {
+        "url": "https://tools.agency-example.gov/wage-calculator",
+        "sha256": "12223427bd1941faadbbc48992a2323ff6732fcc4f9fbcc6392087a30968b70a",
+        "kind": "calculator",
+        "title": "Made-up notice: wage survey support",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      },
+      {
+        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+        "sha256": "ef9d411db4f2413cd15485c0c452d61282fe21f188a422fc6bb442e8aceaec5b",
+        "kind": "attachment",
+        "title": "Made-up notice: wage survey support",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      },
+      {
+        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+        "sha256": "f9e9fb47a5de0236cc10e986fb29d6b47f455db2fedb5cba37f71248d7a2da24",
+        "kind": "attachment",
+        "title": "Made-up notice: wage survey support",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      },
+      {
+        "url": "https://calc.depot-example.mil/rates",
+        "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
+        "kind": "link",
+        "title": "Made-up notice: depot rate study",
+        "via": "sam-gov:0000000000000000000000000000a002"
+      },
+      {
+        "url": "https://calc.depot-example.mil/Rate-Calculator",
+        "sha256": "84d392e8439217bbf374e7b86a9b038d95fd4326b4fa554228aa6bde1c3a1637",
+        "kind": "calculator",
+        "title": "Made-up notice: depot rate study",
+        "via": "sam-gov:0000000000000000000000000000a002"
+      }
+    ]
+  }
+}

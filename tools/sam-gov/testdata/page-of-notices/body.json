@@ -1,0 +1,32 @@
+{
+  "totalRecords": 3,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "noticeId": "0000000000000000000000000000a001",
+      "title": "Made-up notice: wage survey support",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a001/view",
+      "additionalInfoLink": "https://Tools.Agency-Example.gov/wage-calculator/?utm_source=notice",
+      "description": "https://notices.agency-example.gov/api/noticedesc?noticeid=0000000000000000000000000000a001",
+      "resourceLinks": [
+        "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+        "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx"
+      ]
+    },
+    {
+      "noticeId": "0000000000000000000000000000a002",
+      "title": "Made-up notice: depot rate study",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a002/view",
+      "additionalInfoLink": null,
+      "description": "Offerors may check made-up rates at https://calc.depot-example.mil/rates/ (see also HTTPS://calc.depot-example.mil/Rate-Calculator/index.html). Questions go to the made-up help desk.",
+      "resourceLinks": null
+    },
+    {
+      "noticeId": "0000000000000000000000000000a003",
+      "title": "Made-up notice: nothing attached",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a003/view",
+      "description": "No links in this made-up text."
+    }
+  ]
+}

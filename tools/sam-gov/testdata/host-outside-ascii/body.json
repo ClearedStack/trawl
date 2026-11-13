@@ -1,0 +1,13 @@
+{
+  "totalRecords": 1,
+  "limit": 10,
+  "offset": 0,
+  "opportunitiesData": [
+    {
+      "noticeId": "0000000000000000000000000000a00f",
+      "title": "Made-up notice: accented host",
+      "uiLink": "https://notices.agency-example.gov/opp/0000000000000000000000000000a00f/view",
+      "additionalInfoLink": "https://bücher.example.com/katalog"
+    }
+  ]
+}
