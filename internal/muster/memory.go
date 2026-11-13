@@ -309,6 +309,7 @@ func (m *Memory) Complete(_ context.Context, c Completion) error {
 	e.leaseID = ""
 	e.log.State = StateCompleted
 	e.log.Tool = c.Tool
+	e.log.Code, e.log.Reason, e.log.Fingerprint = "", "", ""
 	e.log.Disposition = c.Disposition
 	e.log.Rejects = append([]Reject(nil), c.Rejects...)
 	return nil

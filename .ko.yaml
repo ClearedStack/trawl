@@ -1,0 +1,20 @@
+# Trawl's container image is built straight from source with ko.
+# There is no Dockerfile.
+#
+#   KO_DOCKER_REPO=lazarette.clearedstack.svc.cluster.local:5000 \
+#     ko build --base-import-paths ./cmd/trawl
+#
+# The base image holds no shell and no package manager, and runs as a
+# user that is not root.
+defaultBaseImage: cgr.dev/chainguard/static:latest
+
+builds:
+  - id: trawl
+    main: ./cmd/trawl
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w

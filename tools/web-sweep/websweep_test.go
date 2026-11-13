@@ -2,10 +2,16 @@ package websweep
 
 import (
 	_ "embed"
+	"fmt"
 	"reflect"
+	"runtime"
 	"sort"
+	"strings"
 	"testing"
 
+	"github.com/ClearedStack/trawl/internal/fetch"
+	"github.com/ClearedStack/trawl/internal/intake"
+	"github.com/ClearedStack/trawl/internal/tool"
 	"github.com/ClearedStack/trawl/internal/tooltest"
 )
 
@@ -89,5 +95,38 @@ func TestScan(t *testing.T) {
 func TestScanSurvivesBrokenMarkup(t *testing.T) {
 	for _, doc := range []string{"", "<", "<a", "<a href=\"", "<!--", "<script>", "</a>", "<a href=x><", "<<<>>>", "<a href='x'>t</a", "<base>"} {
 		scan(doc) // must not panic or loop
+	}
+}
+
+// TestLargestPageStaysSmall reads a page of the largest size the fetcher
+// accepts and checks how much memory the whole pass allocates. The worker
+// has a 30 MiB budget; one page must use only a small part of it.
+func TestLargestPageStaysSmall(t *testing.T) {
+	var b strings.Builder
+	b.WriteString("<html><body>")
+	for i := 0; b.Len() < fetch.MaxBody-200; i++ {
+		fmt.Fprintf(&b, "<p>Made-up paragraph %d with filler text to pad the page out.</p>", i)
+		if i%8 == 0 {
+			fmt.Fprintf(&b, `<a href="/tools/%d">Tool %d</a>`, i, i)
+		}
+	}
+	b.WriteString("</body></html>")
+	in := tool.Input{URL: "https://www.agency-example.gov/big", ContentType: "text/html", Body: []byte(b.String())}
+
+	var before, after runtime.MemStats
+	runtime.GC()
+	runtime.ReadMemStats(&before)
+	res, err := intake.Process(New(), in)
+	runtime.ReadMemStats(&after)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Entries) < 1000 {
+		t.Fatalf("only %d links found", len(res.Entries))
+	}
+	allocated := after.TotalAlloc - before.TotalAlloc
+	t.Logf("%d bytes in, %d links out, %d KiB allocated", len(in.Body), len(res.Entries), allocated>>10)
+	if allocated > 8<<20 {
+		t.Errorf("allocated %d KiB for one page; the limit is 8 MiB", allocated>>10)
 	}
 }
