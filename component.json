@@ -1,0 +1,26 @@
+{
+  "slug": "trawl",
+  "name": "Trawl",
+  "formerly": "cs-01-intake",
+  "kind": "worker",
+  "stage": 1,
+  "namespace": "cs-workers",
+  "responsibility": "Finds candidate tools and records each one exactly once.",
+  "interfaces": [
+    "Leases work from Muster over cluster-private HTTP",
+    "Reads public sources: SAM.gov notices, GitHub issues, scheduled site sweeps and the site's own form"
+  ],
+  "repository": "trawl",
+  "image": "trawl",
+  "dependsOn": [
+    "muster"
+  ],
+  "memory": "30 MiB",
+  "version": "v0.1.0-draft",
+  "subTools": [
+    "sam-gov",
+    "github-issues",
+    "web-sweep",
+    "site-form"
+  ]
+}
