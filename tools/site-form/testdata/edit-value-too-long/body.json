@@ -1,0 +1,9 @@
+{
+  "kind": "edit",
+  "target": "PA-0007",
+  "field": "category",
+  "value": "category category category category category category category category category category ",
+  "website": "",
+  "pow": {"challenge": "made-up-challenge-02", "nonce": "797106"},
+  "ip_hash": "f34a8536827d64513a5054453f4a6eeb73729d65e80421e104c78c950d716c0b"
+}

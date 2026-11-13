@@ -1,0 +1,7 @@
+{
+  "kind": "candidate",
+  "url": "https://forms.agency-example.gov/library",
+  "website": "",
+  "pow": {"challenge": "made-up-challenge-01", "nonce": "1487822"},
+  "ip_hash": "b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1"
+}

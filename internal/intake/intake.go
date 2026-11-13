@@ -63,11 +63,13 @@ func Process(t tool.Tool, in tool.Input) (Result, error) {
 		norm, err := normalize.Normalize(c.URL)
 		if err != nil {
 			e, _ := errs.As(err)
-			e = e.WithTool(name)
 			if e.Code == errs.NeedsSubtool {
-				return Result{}, e
+				// The fingerprint names the kind of case, not the one
+				// address, so every item paused for the same reason
+				// reports the same fingerprint.
+				return Result{}, errs.New(errs.NeedsSubtool, e.Reason, []byte(name+"\n"+e.Reason)).WithTool(name)
 			}
-			res.Rejects = append(res.Rejects, reject(e))
+			res.Rejects = append(res.Rejects, reject(e.WithTool(name)))
 			continue
 		}
 		res.Entries = append(res.Entries, dedupe.Entry{

@@ -1,0 +1,5 @@
+# The sub-tools of Trawl, by folder name. Each folder holds a matching rule
+# (match.yaml), the logic (Go) and fixtures (testdata/).
+contract: v1
+tools:
+  - site-form

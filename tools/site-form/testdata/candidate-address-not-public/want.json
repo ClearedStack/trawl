@@ -1,0 +1,14 @@
+{
+  "result": {
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "site-form",
+        "reason": "host_not_public",
+        "fingerprint": "0ea70552d0f7"
+      }
+    ],
+    "rate_key": "site-form/2031-03-04/b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1",
+    "rate_limit": 5
+  }
+}
