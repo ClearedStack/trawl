@@ -1,6 +1,10 @@
-// Package dedupe decides, for each canonical address, whether it is already
-// recorded or needs a new identifier. It holds no state of its own: the
-// caller supplies what is already known and gets back what to write.
+// Package dedupe is the record-once logic behind the trawl normalize
+// command: the SHA-256 digest of a canonical address, the PA-XXXX
+// identifiers of the plain file store, and the decision whether an address
+// is new to that store.
+//
+// The worker does not use it. Against the hub, Trawl sends the clean
+// address and the hub decides whether it is known and mints the identifier.
 package dedupe
 
 import (
@@ -42,60 +46,28 @@ func ParseID(id string) (int, bool) {
 	return n, true
 }
 
-// Entry is one canonical address waiting for a decision.
-type Entry struct {
-	URL    string `json:"url"`
-	SHA256 string `json:"sha256"`
-	Kind   string `json:"kind,omitempty"`
-	Title  string `json:"title,omitempty"`
-	Via    string `json:"via,omitempty"`
-}
-
-// Record is a new address with the identifier minted for it.
+// Record is an address with the identifier minted for it.
 type Record struct {
-	ID     string `json:"id"`
-	SHA256 string `json:"sha256"`
-	URL    string `json:"url"`
-	Kind   string `json:"kind,omitempty"`
-	Title  string `json:"title,omitempty"`
-	Via    string `json:"via,omitempty"`
+	ID     string
+	SHA256 string
+	URL    string
 }
 
-// Sighting notes that an address already on record was seen again.
-type Sighting struct {
-	ID     string `json:"id"`
-	SHA256 string `json:"sha256"`
-	Via    string `json:"via,omitempty"`
-}
-
-// Decide walks entries in order. An entry whose hash is in known becomes a
-// sighting of that identifier. The first entry with an unknown hash is given
-// the next identifier after lastSeq; a later entry with the same hash is
-// dropped, since one item reports one address once.
-func Decide(entries []Entry, known map[string]string, lastSeq int) (records []Record, sightings []Sighting) {
+// Decide gives each canonical address in urls that is not in known the
+// next identifier after lastSeq, in order. known maps a digest to its
+// identifier. An address that is known, or that appeared earlier in urls,
+// yields nothing.
+func Decide(urls []string, known map[string]string, lastSeq int) []Record {
+	var records []Record
 	minted := map[string]bool{}
-	sighted := map[string]bool{}
-	for _, e := range entries {
-		if id, ok := known[e.SHA256]; ok {
-			if !sighted[e.SHA256] {
-				sighted[e.SHA256] = true
-				sightings = append(sightings, Sighting{ID: id, SHA256: e.SHA256, Via: e.Via})
-			}
+	for _, url := range urls {
+		hash := Hash(url)
+		if _, ok := known[hash]; ok || minted[hash] {
 			continue
 		}
-		if minted[e.SHA256] {
-			continue
-		}
-		minted[e.SHA256] = true
+		minted[hash] = true
 		lastSeq++
-		records = append(records, Record{
-			ID:     FormatID(lastSeq),
-			SHA256: e.SHA256,
-			URL:    e.URL,
-			Kind:   e.Kind,
-			Title:  e.Title,
-			Via:    e.Via,
-		})
+		records = append(records, Record{ID: FormatID(lastSeq), SHA256: hash, URL: url})
 	}
-	return records, sightings
+	return records
 }

@@ -29,21 +29,36 @@ const memoryLimit = 20 << 20
 // defaultTokenFile is where Kubernetes mounts a pod's ServiceAccount token.
 const defaultTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-// runWork leases items from the hub and processes them until it is told to
-// stop. The only directory it writes to is the spool.
+// runWork sweeps the sources, files what it finds with the hub, and leases
+// and records discovered items until it is told to stop. The only
+// directory it writes to is the spool.
 func runWork(args []string, _, stderr io.Writer) int {
 	fs := flag.NewFlagSet("work", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	hubURL := fs.String("muster-url", "", "address of the hub, for example http://hub.made-up.svc:8080 (required)")
 	tokenFile := fs.String("token-file", defaultTokenFile, "file holding the ServiceAccount token; empty to send none")
-	spoolDir := fs.String("spool", spool.DefaultDir, "directory where finished work waits for the hub")
-	drain := fs.Bool("drain", false, "stop once every lane and the spool are empty")
+	spoolDir := fs.String("spool", spool.DefaultDir, "directory where work waits for the hub")
+	sourcesFile := fs.String("sources", "", "JSON file listing the public sources to sweep; empty to sweep nothing")
+	sweepEvery := fs.Duration("sweep-every", 6*time.Hour, "time between sweeps of the sources; 0 to sweep once")
+	drain := fs.Bool("drain", false, "sweep once, then stop when there is nothing to lease and the spool is empty")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
-	if *hubURL == "" || fs.NArg() != 0 {
+	if *hubURL == "" || fs.NArg() != 0 || *sweepEvery < 0 {
 		fmt.Fprintln(stderr, "work needs -muster-url and takes no other arguments")
 		return 2
+	}
+	var sources []worker.Source
+	if *sourcesFile != "" {
+		data, err := os.ReadFile(*sourcesFile)
+		if err != nil {
+			fmt.Fprintln(stderr, "the sources file could not be read")
+			return 2
+		}
+		if sources, err = worker.ParseSources(data); err != nil {
+			fmt.Fprintln(stderr, err)
+			return 2
+		}
 	}
 
 	debug.SetMemoryLimit(memoryLimit)
@@ -72,13 +87,15 @@ func runWork(args []string, _, stderr io.Writer) int {
 	defer stop()
 
 	w := &worker.Worker{
-		Hub:     hub,
-		Spool:   sp,
-		Tools:   set,
-		Fetcher: fetch.New(fetch.DefaultTimeout),
-		Log:     log,
+		Hub:        hub,
+		Spool:      sp,
+		Tools:      set,
+		Fetcher:    fetch.New(fetch.DefaultTimeout),
+		Log:        log,
+		Sources:    sources,
+		SweepEvery: *sweepEvery,
 	}
-	log.Info("started", "version", version, "contract", muster.ContractVersion, "subtools", set.Names())
+	log.Info("started", "version", version, "contract", muster.ContractVersion, "subtools", set.Names(), "sources", len(sources))
 	if err := w.Run(ctx, *drain); err != nil {
 		log.Error("stopped", "why", err.Error())
 		return 1

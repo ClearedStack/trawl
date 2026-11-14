@@ -1,8 +1,5 @@
 {
-  "kind": "candidate",
-  "url": "https://calc.depot-example.mil/rates",
-  "title": "\u003cb\u003eRate\u003c/b\u003e table \u003cscript\u003ealert('x')\u003c/script\u003e  helper",
-  "website": "",
-  "pow": {"challenge": "made-up-challenge-01", "nonce": "195544"},
-  "ip_hash": "b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1"
+  "source": "site-form",
+  "title": "<b>Rate</b> table <script>alert('x')</script>  helper",
+  "address": "https://calc.depot-example.mil/rates"
 }

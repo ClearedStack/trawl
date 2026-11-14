@@ -1,15 +1,12 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://calc.depot-example.mil/rates",
-        "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-        "kind": "submission",
+        "address": "https://calc.depot-example.mil/rates",
         "title": "Rate table helper",
+        "kind": "submission",
         "via": "site-form"
       }
-    ],
-    "rate_key": "site-form/2031-03-04/b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1",
-    "rate_limit": 5
+    ]
   }
 }

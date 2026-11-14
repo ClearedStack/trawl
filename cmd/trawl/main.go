@@ -16,7 +16,8 @@ Usage:
   trawl normalize [-store FILE]    read addresses from standard input, one per
                                    line, and print the normalized form, the
                                    SHA-256 hash and whether each was seen before
-  trawl work -muster-url URL       lease work from Muster and process it
+  trawl work -muster-url URL       sweep public sources, file what is found with
+                                   Muster, and record the items Muster hands out
   trawl version                    print the version
 `
 

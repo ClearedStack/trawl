@@ -121,11 +121,11 @@ func TestLargestPageStaysSmall(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(res.Entries) < 1000 {
-		t.Fatalf("only %d links found", len(res.Entries))
+	if len(res.Candidates) < 1000 {
+		t.Fatalf("only %d links found", len(res.Candidates))
 	}
 	allocated := after.TotalAlloc - before.TotalAlloc
-	t.Logf("%d bytes in, %d links out, %d KiB allocated", len(in.Body), len(res.Entries), allocated>>10)
+	t.Logf("%d bytes in, %d links out, %d KiB allocated", len(in.Body), len(res.Candidates), allocated>>10)
 	if allocated > 8<<20 {
 		t.Errorf("allocated %d KiB for one page; the limit is 8 MiB", allocated>>10)
 	}

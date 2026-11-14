@@ -12,20 +12,26 @@
 
 ---
 
-> **Status: built, not yet deployed.** The code and its tests are here and pass. Trawl has only ever run against a stand-in for Muster, because Muster does not exist yet, and it has never run in a cluster. See [What is not done](#what-is-not-done).
+> **Status: built against Muster's contract v1, not yet deployed.** The code and its tests are here and pass. Trawl speaks [contract v1](https://github.com/ClearedStack/muster/blob/claude/repo-build-prompt-1csgx6/contract/v1/CONTRACT.md) and replays Muster's own saved examples in its tests. It has not yet been run against a running Muster, and it has never run in a cluster. See [What is not done](#what-is-not-done).
 
 Trawl is stage 01 of the ClearedStack pipeline. ClearedStack is an open pipeline that finds ideas for government-contracting tools, screens and scores them, and builds each one from the public rule. Trawl is meant to be understood and used without the rest.
 
 ## What works today
 
-- **One address in, one canonical address out.** `trawl normalize` reads addresses on standard input and prints each in its canonical form, with its SHA-256 hash and whether it has been seen before. Sixteen rules do the work, and each has a file of saved examples.
-- **Each address is recorded once.** A new hash gets the next `PA-XXXX` identifier. A hash already on record is logged as a sighting of the existing identifier.
-- **A worker loop.** `trawl work` leases items from the hub, always `urgent` before `normal` before `backfill`, keeps the lease alive with heartbeats, and reports each item as complete, failed or needing a sub-tool.
+Trawl has two duties, and `trawl work` does both.
+
+- **Find.** On a schedule it reads the public sources listed in a sources file, runs the sub-tool for each, cleans every address it finds, and files each one with Muster. Muster makes a `discovered` item for an address it has not seen, and answers "known" for one it has.
+- **Record.** It leases its `discovered` items from Muster one at a time, checks what was recorded, and completes each to `recorded`, which hands it to Sextant, or to `rejected`.
+
+Around those:
+
+- **One address in, one canonical address out.** Sixteen rules, each with a file of saved examples. `trawl normalize` runs them on its own, with no hub.
+- **Each address is recorded once.** Muster compares addresses exactly as sent, so making equivalent addresses equal is Trawl's job: it only ever files the clean form.
 - **Four sub-tools**, one per source: `sam-gov`, `github-issues`, `web-sweep` and `site-form`.
-- **A spool.** Finished work is written to disk before the hub is told. If the hub is away, the work waits and is sent in order when the hub returns, even if Trawl itself restarted in between.
-- **Three error codes and nothing else.** `E_TIMEOUT`, `E_PARSE` and `E_NEEDS_SUBTOOL`, each with a reason from a fixed list and a 12-character fingerprint. No error carries an address, a machine name or a credential.
-- **No AI and no clock in the output.** The same items in the same order give the same bytes. A test runs the whole pipeline twice and compares.
-- **Small.** The built binary drained 7,320 made-up records from the stand-in hub with a peak of about 11 MiB of memory, against a budget of 30 MiB. The binary reports its own peak when it stops.
+- **A spool.** Everything bound for Muster is written to disk first. If Muster is away, the work waits and is sent in order when it returns, even if Trawl itself restarted in between.
+- **Three error codes and nothing else.** `E_TIMEOUT`, `E_PARSE` and `E_NEEDS_SUBTOOL`, each with a reason from a fixed list and a 12-character fingerprint. No error or log line carries an address, a machine name or a credential.
+- **No AI and no clock in the output.** The same sources and items in the same order give the same bytes. A test runs the whole pipeline twice and compares.
+- **Small, and standard library only.** There are no dependencies outside Go itself. The built binary recorded 2,001 made-up items with a peak of about 10 MiB of memory, against a budget of 30 MiB.
 
 ## Run it
 
@@ -34,7 +40,7 @@ You need Go 1.24 or later.
 ```sh
 go build -o trawl ./cmd/trawl
 
-# Normalize, hash and remember addresses. The store is a plain text file.
+# Clean, hash and remember addresses, with no hub. The store is a text file.
 printf 'HTTPS://Tools.Agency-Example.GOV/wage/index.html?utm_source=news#top\n' \
   | ./trawl normalize -store trawl.store
 # url     https://tools.agency-example.gov/wage
@@ -42,18 +48,32 @@ printf 'HTTPS://Tools.Agency-Example.GOV/wage/index.html?utm_source=news#top\n' 
 # seen    no
 # id      PA-0001
 
-# Run the worker against a hub.
-./trawl work -muster-url http://HUB-ADDRESS -spool /var/spool/cs
+# Run the worker against Muster.
+./trawl work -muster-url http://HUB-ADDRESS -sources sources.json -spool /var/spool/cs
 ```
 
 `trawl work` takes these flags:
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
-| `-muster-url` | none, required | Address of the hub. |
-| `-token-file` | the Kubernetes ServiceAccount token path | File holding the token sent to the hub. Empty sends none. |
+| `-muster-url` | none, required | Address of Muster. |
+| `-token-file` | the Kubernetes ServiceAccount token path | File holding the token sent to Muster. It is read again for every call. Empty sends none. |
 | `-spool` | `/var/spool/cs` | The one directory Trawl writes to. |
-| `-drain` | off | Stop once every lane and the spool are empty. |
+| `-sources` | none | The sources file. Without it Trawl sweeps nothing and only records. |
+| `-sweep-every` | `6h` | Time between sweeps. `0` sweeps once. |
+| `-drain` | off | Sweep once, then stop when there is nothing to lease and the spool is empty. |
+
+The sources file is JSON. Each entry names a source Muster knows, the format of the document, and the public address to read it from:
+
+```json
+{
+  "sources": [
+    {"source": "web-sweep", "format": "web-sweep.page.v1", "fetch": "https://www.agency-example.gov/small-business/resources"},
+    {"source": "github-issues", "format": "github-issues.v1", "fetch": "https://code.agency-example.gov/api/issues"},
+    {"source": "sam-gov", "format": "sam-gov.opportunities.v2", "fetch": "https://feed.agency-example.gov/opportunities/v2/search?limit=100"}
+  ]
+}
+```
 
 ### Tests
 
@@ -75,6 +95,40 @@ KO_DOCKER_REPO=lazarette.clearedstack.svc.cluster.local:5000 \
 
 This was checked with ko v0.19.1 by building to a file without pushing. The image came to about 3.7 MB, runs as user 65532 and starts `/ko-app/trawl`, so a pod passes `work -muster-url ...` as arguments. It has not been pushed to a registry or run in a cluster.
 
+## How Trawl talks to Muster
+
+Every call is a `POST` of a JSON object that carries `"contract": "v1"`, with Trawl's ServiceAccount token as a bearer token. Muster refuses a body with a field the call does not define, so Trawl sends exactly these and nothing else:
+
+| Call | Trawl sends | Trawl reads |
+| --- | --- | --- |
+| `/v1/items` | `contract`, `source`, `title`, `address`, `result` | `201` is new, `200` with `"duplicate": true` is known, and `id` |
+| `/v1/lease` | `contract` | `lease`, `kind`, `id`, `state`, `found` and `results`; `204` when there is nothing |
+| `/v1/heartbeat` | `contract`, `lease` | the status |
+| `/v1/complete` | `contract`, `lease`, `state`, `result` | the status |
+| `/v1/fail` | `contract`, `lease`, `code` | the status |
+| `/v1/needs_subtool` | `contract`, `lease` | the status |
+
+Muster decides the order of leases: `urgent` first, then `normal`, then `backfill`. Trawl takes what it is offered. Muster also mints the `PA-XXXX` identifiers and owns the rate limits.
+
+What Trawl files as `result`, and reports again when it completes an item to `recorded`, is the record the next worker reads under `results.trawl`:
+
+```json
+{"source": "web-sweep", "address": "https://tools.agency-example.gov/wage", "title": "Wage calculator", "kind": "link", "via": "https://www.agency-example.gov/small-business/resources"}
+```
+
+A refusal is sorted by its status. `409` means the lease is gone or the move is not allowed, and the staged outcome is dropped. `401`, `403`, `429` and `5xx` mean try later, and the work stays in the spool. Any other refusal cannot succeed if repeated, so the entry is set aside in the spool and logged. Only the status, the code and Muster's `cause` word are logged, never its sentence.
+
+### What Trawl does with a leased item
+
+| The item | Outcome |
+| --- | --- |
+| Its address is clean as recorded | Completed to `recorded`. |
+| Its address is not public or is broken | Completed to `rejected`, with the public error as the result. |
+| Cleaning changes its address, and its source is one Trawl sweeps | Trawl files the clean address. If it is new, it becomes an item of its own and this one is `rejected` as `superseded`. If it is known, this one is `rejected` as `duplicate`. |
+| Cleaning changes its address, and it came through the site's form | Completed to `recorded` with the clean address in the result. See the first gap below. |
+| What was recorded for the form is not the expected shape | `fail` with `E_PARSE`. |
+| No rule covers it: an unknown source, a host name outside ASCII, a step that is not a discovered item | `needs_subtool`. Contract v1 refuses that for a `discovered` item, so Trawl then fails it with `E_PARSE`, which holds it for the owner. See the second gap below. |
+
 ## In this repository
 
 | Path | What it is |
@@ -85,16 +139,15 @@ This was checked with ko v0.19.1 by building to a file without pushing. The imag
 | [`cmd/trawl`](cmd/trawl) | The `trawl` command: `normalize`, `work`, `version`. |
 | [`tools/`](tools) | The sub-tools. [`registry.yaml`](tools/registry.yaml) lists them; each folder holds `match.yaml`, the Go logic and `testdata/`. |
 | [`internal/normalize`](internal/normalize) | The address rules and their saved examples. |
-| [`internal/dedupe`](internal/dedupe) | SHA-256 hashing, `PA-XXXX` identifiers, and the record-or-sighting decision. |
-| [`internal/muster`](internal/muster) | The interface to the hub, an in-memory stand-in, and an HTTP client. |
-| [`internal/spool`](internal/spool) | The on-disk queue of finished work. |
-| [`internal/worker`](internal/worker) | The lease, process, stage and acknowledge loop. |
+| [`internal/muster`](internal/muster) | The interface to Muster, the HTTP client, a fake hub for tests, and a copy of Muster's contract examples. |
+| [`internal/spool`](internal/spool) | The on-disk queue of work bound for Muster. |
+| [`internal/worker`](internal/worker) | The sweep, file, lease and record loop. |
 | [`internal/fetch`](internal/fetch), [`internal/robots`](internal/robots) | Reading public addresses, and obeying `robots.txt`. |
 | [`internal/intake`](internal/intake), [`internal/screen`](internal/screen) | Rules every candidate passes: marking screen, markup stripping, normalization. |
+| [`internal/tool`](internal/tool) | What a sub-tool is, and the reader for the two YAML files. |
 | [`internal/errs`](internal/errs) | The three public error codes. |
-| [`internal/store`](internal/store) | The plain file store behind `trawl normalize`. The worker never uses it. |
+| [`internal/dedupe`](internal/dedupe), [`internal/store`](internal/store) | The hash and the plain file store behind `trawl normalize`. The worker uses neither. |
 | [`brand/`](brand) | The Trawl logo and mark, for light and dark backgrounds. |
-| [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) | The license of the one outside library. |
 
 ## At a glance
 
@@ -139,28 +192,30 @@ The rules run in this order. Each has a file of saved examples in [`internal/nor
 
 ## The sub-tools
 
-A matching rule compares an item's `source` and `format` with the rule in `match.yaml`. Exactly one rule must match. If none does, or more than one, the item is paused as `needs_subtool`.
+Each sub-tool is a folder under `tools/` with a matching rule, logic and fixtures, listed in `tools/registry.yaml`. A sources-file entry is matched to a sub-tool by its `source` and `format`, and a leased item by its `source`. Exactly one rule must match.
 
-| Sub-tool | Matches | Input | What it records | Saved cases |
-| --- | --- | --- | --- | --- |
-| [`sam-gov`](tools/sam-gov) | `sam-gov` / `sam-gov.opportunities.v2` | inline or fetched | From each notice: the additional-information link, each attachment, and each address in the description text. An address containing "calculator" is marked as one. | 16 |
-| [`github-issues`](tools/github-issues) | `github-issues` / `github-issues.v1` | inline or fetched | From each issue labelled `tool-suggestion` or `paperwork-suggestion` and written with the matching issue form: the address and the name. | 19 |
-| [`web-sweep`](tools/web-sweep) | `web-sweep` / `web-sweep.page.v1` | fetched only | From one HTML page: each link whose text or path contains a word from a fixed list, such as "calculator", "template" or "checklist". | 10 |
-| [`site-form`](tools/site-form) | `site-form` / `site-form.v1` | inline only | A candidate address, or a proposed edit to one field of a record. | 27 |
+| Sub-tool | Reads | What it yields | Saved cases |
+| --- | --- | --- | --- |
+| [`sam-gov`](tools/sam-gov) | A fetched page of notices, format `sam-gov.opportunities.v2` | From each notice: the additional-information link, each attachment, and each address in the description text. An address containing "calculator" is marked as one. | 16 |
+| [`github-issues`](tools/github-issues) | A fetched list of issues, format `github-issues.v1` | From each issue labelled `tool-suggestion` or `paperwork-suggestion` and written with the matching issue form: the address and the name. | 19 |
+| [`web-sweep`](tools/web-sweep) | A fetched HTML page, format `web-sweep.page.v1` | Each link whose text or path contains a word from a fixed list, such as "calculator", "template" or "checklist". | 10 |
+| [`site-form`](tools/site-form) | What Muster recorded for a candidate from the site's form: `source`, `title`, `address` | That one candidate, if the record has exactly that shape and is at most 4 KB. | 20 |
 
 Adding a sub-tool means adding a folder with those three parts, a line in `tools/registry.yaml` and a line in `tools/tools.go`. A test fails if a folder is not registered or a registered folder lacks a part.
 
+The two YAML files are read by a small reader in `internal/tool`, written against the standard library. It accepts plain `key: value` lines, nested keys and lists of plain words, and refuses everything else.
+
 ## Errors
 
-| Code | Meaning | What the hub does with it |
-| --- | --- | --- |
-| `E_TIMEOUT` | Something outside took too long, was unreachable or answered with a server error. | Puts the item back in its lane to be tried again. |
-| `E_PARSE` | The data was broken or failed validation. | Halts that item. |
-| `E_NEEDS_SUBTOOL` | The data was valid and no rule covers it. | Pauses the item until a rule ships, then replays it. |
+| Code | Meaning |
+| --- | --- |
+| `E_TIMEOUT` | Something outside took too long, was unreachable or answered with a server error. A source that fails this way is read again on the next sweep. |
+| `E_PARSE` | The data was broken or failed validation. |
+| `E_NEEDS_SUBTOOL` | The data was valid and no rule covers it. |
 
-An error is printed as, for example, `E_PARSE tool=site-form reason=honeypot fp=f9751ff461cb`. The fingerprint of an `E_NEEDS_SUBTOOL` depends only on the kind of case, so every item paused for the same reason reports the same one.
+An error is printed as, for example, `E_PARSE tool=site-form reason=schema fp=6d5c8ff7a60c`. The fingerprint of an `E_NEEDS_SUBTOOL` depends only on the kind of case, so every case stopped for the same reason reports the same one.
 
-When one entry inside an item is broken, such as one notice in a page, that entry is refused and the rest of the item goes on. When one entry is valid and unfamiliar, the whole item is paused, because the contract can pause an item and not part of one. Replaying it later is safe: nothing is recorded twice.
+When one entry in a fetched document is broken, such as one notice in a page, that entry is refused and logged and the rest of the document goes on. When one entry is valid and unfamiliar, the whole document is set down until a rule exists. Reading it again later is safe: Muster answers "known" for what it already has.
 
 ## Requirements in `SPEC.md` and where each stands
 
@@ -168,72 +223,71 @@ When one entry inside an item is broken, such as one notice in a page, that entr
 
 | Requirement | State | Where it is tested |
 | --- | --- | --- |
-| `lease`, `heartbeat`, `complete`, `fail`, `needs_subtool` over HTTP with the ServiceAccount token, contract `v1` | Built against the stand-in | `internal/muster`, `internal/worker` |
-| Lanes drained `urgent`, then `normal`, then `backfill` | Built | `TestLanesAreDrainedInOrder` |
+| `lease`, `heartbeat`, `complete`, `fail`, `needs_subtool` over HTTP with the ServiceAccount token, contract `v1` | Built to Muster's contract and replayed against its examples | `internal/muster` |
+| Lanes drained `urgent`, then `normal`, then `backfill` | Muster's to order under contract v1. Trawl takes what it is offered. | `TestLaneOrderIsTheHubs` |
 | Lowercase scheme and host | Built | `internal/normalize` |
 | Strip tracking and session parameters and fragments | Built | `internal/normalize` |
 | Remove trailing slashes and default index filenames | Built | `internal/normalize` |
 | Public-only scheme and host | Built | `internal/normalize`, `internal/fetch` |
-| SHA-256 of the canonical address, checked through the hub | Built | `internal/dedupe`, `internal/worker` |
-| Existing hash becomes a sighting, no duplicate | Built | `TestEachAddressIsRecordedOnce` |
-| New hash mints a `PA-XXXX` identifier and is queued for the next stage | Built | `internal/worker`, `tools/testdata/pipeline.golden.json` |
-| Finished work staged in `/var/spool/cs` before the hub is told, flushed in order | Built | `TestHubRestartMidBatch`, `TestSpoolIsFlushedInOrder` |
+| SHA-256 of the canonical address, checked through Muster | Changed: Trawl sends the clean address and Muster keeps the key. `trawl normalize` still prints the SHA-256. | `TestNoHashIsSent` |
+| Existing address is logged as a sighting, no duplicate | Built. Muster notes the sighting when it answers "known". | `TestSweepFilesAndRecords` |
+| New address gets a `PA-XXXX` identifier, moves `discovered` to `recorded`, and is queued for Sextant | Built. Muster mints; Trawl completes to `recorded`. | `internal/worker`, `tools/testdata/pipeline.golden.json` |
+| Work staged in `/var/spool/cs` before Muster is told, flushed in order | Built | `TestHubRestartMidBatch`, `TestOutcomeWaitsForTheHub` |
 
 ### Failure modes
 
 | Failure | State | Where it is tested |
 | --- | --- | --- |
-| Unknown source format pauses the item and carries on | Built | `TestFailuresDoNotStopTheRest` |
-| Paused items are replayed once a rule exists | Built in the stand-in only | `TestFailAndNeedsSubtool` |
-| Upstream timeout leaves the item in the queue | Built | `TestFetchOutcomes`, `internal/fetch` |
-| Malformed payload halts that item with a sanitized fingerprint | Built | every sub-tool's `testdata` |
+| Unknown source format is stopped and the rest carries on | Built | `TestSweepFailuresDoNotStopTheRest`, `TestLeasedItems` |
+| Paused items are replayed once a rule exists | Not possible for Trawl under contract v1. See the second gap below. | n/a |
+| Upstream timeout does not lose anything | Built. The source is read again on the next sweep. | `TestSweepFailuresDoNotStopTheRest`, `internal/fetch` |
+| Malformed payload halts that item with a sanitized fingerprint | Built | every sub-tool's `testdata`, `TestLeasedItems` |
 | Hub unavailable: work is kept and flushed later | Built | `TestHubRestartMidBatch` |
 
 ### Security
 
 | Rule | State | Where it is tested |
 | --- | --- | --- |
-| No database access; all state goes through the hub | Built. Trawl holds no database client or credential. | By construction |
-| Form shield 1: proof of work | Verified by Trawl: 18 leading zero bits, bound to the submission | `tools/site-form` |
-| Form shield 2: honeypot | Verified by Trawl | `tools/site-form` |
-| Form shield 3: rate limit on a daily-salted hash, never a raw IP | Counted through the hub: 5 a day per hash. A submission with an `ip` key is refused. | `TestRateLimit`, `raw-ip-refused` |
-| Form shield 4: 4 KB schema with markup stripped | Verified by Trawl | `tools/site-form`, `internal/screen` |
-| Form shield 5: owner approval before an edit takes effect | Not Trawl's. An edit leaves Trawl as a proposal and changes nothing. | n/a |
+| No database access; all state goes through Muster | Built. Trawl holds no database client or credential. | By construction |
+| Form shield 1 to 3: proof of work, honeypot, rate limit | Muster's, checked before an item exists. Trawl is never given the visitor's address or the proof. | `TestSiteFormFilingByConn` |
+| Form shield 4: 4 KB schema with markup stripped | Checked by Trawl's `site-form` | `tools/site-form`, `internal/screen` |
+| Form shield 5: owner approval | After Trawl | n/a |
 | Never ignores `robots.txt` | Built. Asked before every address and every redirect step. | `internal/fetch`, `internal/robots` |
-| Never creates accounts, requests demos, or passes paywalls or CAPTCHAs | Built. Trawl sends `GET` only, with no cookies and no credentials, and stops at a sign-in. | `internal/fetch` |
+| Never creates accounts, requests demos, or passes paywalls or CAPTCHAs | Built. Trawl sends `GET` only to public sites, with no cookies and no credentials, and stops at a sign-in. | `internal/fetch` |
 | Never accepts controlled information | Partly. Text carrying a control marking is refused and not stored. | `internal/screen` |
 | Runs unprivileged with a read-only filesystem | The binary writes only under the spool directory. The pod settings are not in this repository. | See below |
 
+## Gaps between contract v1 and what Trawl needs
+
+These are for Muster's side to settle. Trawl's behaviour today is stated for each.
+
+1. **A form address cannot be filed again in its clean form.** Muster compares addresses exactly as sent and leaves cleaning to Trawl. For an item Conn filed with an address that cleaning changes, the only way to learn whether the clean address is known is to file it, and Muster refuses a `site-form` filing without the visitor's proof of work, which Trawl does not have. So Trawl records the item with the clean address in its result. The same address typed two ways through the form therefore becomes two recorded items. `TestFormAddressTypedTwoWays` pins this. Either of these would close it: let Trawl file a `site-form` address without `pow` and `visitor`, or add a call that asks whether an address is known.
+2. **Trawl cannot pause an item.** The state table has no move from `discovered` to `needs_subtool`. When no rule covers a leased item, Trawl calls `needs_subtool`, is refused, and fails the item with `E_PARSE`, which holds it for the owner to release. That is the wrong code for data that is valid and unfamiliar, and such items are not replayed when a new sub-tool ships.
+3. **Nothing reports a failed sweep.** A source that times out or has no rule is logged with its public error and tried again on the next sweep. There is no leased item to fail or pause, so Muster is not told.
+4. **A title is required.** Muster refuses a filing with no title. A candidate found without one, such as a link with no text, is filed under its own address as its title.
+5. **Length limits differ.** Trawl's cleaning accepts an address up to 2,048 bytes and Muster up to 2,000 characters. An address in between is refused by Muster, logged, and the rest of the batch goes on.
+
 ## What is not done
 
-- **Muster.** It does not exist, so Trawl has only run against `internal/muster`'s in-memory stand-in. The HTTP wire format is provisional.
-- **Kubernetes manifests.** There is no Deployment, ServiceAccount, NetworkPolicy or volume for the spool here. Non-root, dropped capabilities and a read-only root filesystem are settings of the pod, and they need names `component.json` does not carry: the hub's address and the priority class.
-- **Live SAM.gov.** Its search API needs a key and Trawl holds no credentials. A `sam-gov` item must carry its page inline, or name an address that needs no key.
-- **Host names outside ASCII.** They are paused as `E_NEEDS_SUBTOOL` (`idn_host`). Converting them correctly needs tables the Go standard library does not have.
-- **Unmarked sensitive text.** Trawl refuses text with a control marking. It cannot recognise controlled information or bid figures that carry no marking. It limits the exposure by keeping only an address, a title of at most 120 characters, and the value of a proposed edit.
-- **Mirror links.** `SPEC.md` mentions "the sighting or mirror link". Trawl records a sighting with where the address was seen. It has no separate idea of a mirror.
+- **A running Muster.** Trawl is tested against a fake hub in `internal/muster` and against a copy of Muster's contract examples. Of the 51 examples, 25 are replayed against the fake and compared exactly; the other 26 concern calls Trawl does not make and are listed with reasons in `contract_test.go`. It has not been pointed at a running Muster.
+- **Kubernetes manifests.** There is no Deployment, ServiceAccount, NetworkPolicy, volume for the spool or ConfigMap for the sources file here. Non-root, dropped capabilities and a read-only root filesystem are settings of the pod.
+- **Live SAM.gov.** Its search API needs a key and Trawl holds no credentials. A `sam-gov` source must be an address that needs no key.
+- **Host names outside ASCII.** They are stopped as `E_NEEDS_SUBTOOL` (`idn_host`). Converting them correctly needs tables the Go standard library does not have.
+- **Unmarked sensitive text.** Trawl refuses text with a control marking. It cannot recognise controlled information or bid figures that carry no marking. It limits the exposure by keeping only an address and a title of at most 120 characters.
 - **Path clean-up beyond the specification.** `.` and `..` segments in an absolute address, doubled slashes inside a path, and percent escapes of ordinary letters are left as they are.
-- **Opening a task for a paused item** and **shipping a new sub-tool** belong to other components. Trawl's part is the stable fingerprint.
-- **Pages that are not HTML or not UTF-8.** A fetched PDF is paused as `not_html`.
+- **Pages that are not HTML or not UTF-8.** A fetched PDF is stopped as `not_html`.
 - **A proxy.** The fetcher connects directly and ignores proxy settings.
 
-## Where the specification was silent
-
-`SPEC.md` leaves these open. The build chose as follows, and each choice is a proposed addition to `SPEC.md`.
+## Choices where the specification was silent
 
 | Question | Choice | Reason |
 | --- | --- | --- |
-| How does Trawl read state? The contract names no call. | Two added calls: `lookup` (which hashes are recorded, and the newest sequence number) and `rate` (add a member to a named set, return its size). | Deduplication "via Muster" needs a read. The rate limit needs a counter and Trawl has no database. |
-| Who mints `PA-XXXX`? | Trawl, as decided for this build. `complete` carries the new records and the sequence number Trawl expected; the hub must refuse the whole completion if the number moved. Trawl then reads again and re-decides, up to five times. | Lets several Trawl replicas run without two addresses getting one identifier. |
-| Identifier format | `PA-` and a decimal number padded to four digits. After `PA-9999` comes `PA-10000`. | Keeps existing identifiers valid for ever. |
-| Wire format | `POST` of JSON to `/v1/lease`, `/v1/heartbeat`, `/v1/lookup`, `/v1/rate`, `/v1/complete`, `/v1/fail`, `/v1/needs_subtool`, with a `Contract-Version: v1` header and the token as a bearer token. | Something concrete to test against. |
-| What is in an item? | `source`, `format`, `observed_at`, and exactly one of `fetch` (an address) or `payload` (the document). | The matching rules need something to match, and time must come from the hub for outputs to be repeatable. |
-| Who schedules sweeps? | The hub, or whatever fills its queue. Trawl reads the one page an item names and follows nothing. | A worker that only leases cannot schedule. |
+| Who starts a sweep? | Trawl, from a sources file, every `-sweep-every`. | A lease in contract v1 carries an item, never a job to read a source. |
 | What makes a link a candidate? | A whole word from a fixed list in its text or path. The list is `Words` in `tools/web-sweep/websweep.go`. | The specification gives no rule. This one is provisional and easy to change. |
 | What does a suggestion issue look like? | Two labels and two issue forms, described at the top of `tools/github-issues/githubissues.go`. | The specification says "structured" without giving the structure. |
-| What is `ownership_map.json`? | A stand-in at `tools/site-form/ownership_map.json`: the fields an edit may target, each with a longest length. | The real file is not in this repository. |
 | What is a "sanitized fingerprint"? | The first 12 hex characters of a SHA-256 digest of the offending bytes, or of the kind of case for `E_NEEDS_SUBTOOL`. | Lets identical failures be grouped without showing the data. |
-| A lease that ended while its result waited in the spool | The result is dropped and the item is processed again when the hub hands it out. | The hub is the only authority on who holds an item. |
+| A lease that ended while its outcome waited in the spool | The outcome is dropped and the item is decided again when Muster offers it. | Muster is the only authority on who holds an item. |
+| Edit proposals from the site | Not Trawl's. They go from Conn to Muster and on to the owner. | Contract v1 routes them to Countersign. |
 
 ## Names
 
@@ -246,6 +300,13 @@ When one entry inside an item is broken, such as one notice in a page, that entr
 - **Clean room.** Written from scratch. No code, text or design is copied from another project.
 - **Public sources and made-up data only.** Nothing classified, controlled or taken from a real contract, in code, tests, issues or commit messages. Every host, notice, issue and submission in the fixtures is invented.
 
+## Ground rules
+
+- **No AI when it runs.** The same input gives the same output on any machine.
+- **Stop instead of guessing.** A case with no rule is stopped and reported, never improvised.
+- **Clean room.** Written from scratch. No code, text or design is copied from another project. The one exception is `internal/muster/testdata/contract-v1/examples`, which is a copy of the examples that define the contract with Muster, kept so the tests can replay them.
+- **Public sources and made-up data only.** Nothing classified, controlled or taken from a real contract, in code, tests, issues or commit messages. Every host, notice, issue and submission in the fixtures is invented.
+
 ## License
 
-[MIT](LICENSE). The one outside library and its license are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). ClearedStack is an independent personal project. It is not affiliated with, endorsed by, or sponsored by the U.S. Department of Defense or any other government agency.
+[MIT](LICENSE). Trawl depends on nothing outside the Go standard library. ClearedStack is an independent personal project. It is not affiliated with, endorsed by, or sponsored by the U.S. Department of Defense or any other government agency.

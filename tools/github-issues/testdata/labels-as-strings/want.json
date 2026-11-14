@@ -1,11 +1,11 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://tools.agency-example.gov/wage",
-        "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+        "address": "https://tools.agency-example.gov/wage",
         "kind": "tool",
-        "via": "github-issues#32"
+        "via": "github-issues#32",
+        "changed": true
       }
     ]
   }

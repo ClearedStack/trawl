@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://forms.agency-example.gov/long",
+        "title": "A made-up title that goes on and on and on and on and on and on and on and on and on and on and on and on and on and on",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    ]
+  }
+}

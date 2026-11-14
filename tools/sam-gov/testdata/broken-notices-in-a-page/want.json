@@ -1,11 +1,10 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a00b/a.pdf",
-        "sha256": "009ce4208169cadf340d548de15ab119b8e02960cdf875c360e3bddc90095704",
-        "kind": "attachment",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a00b/a.pdf",
         "title": "Made-up notice: the good one",
+        "kind": "attachment",
         "via": "sam-gov:0000000000000000000000000000a00b"
       }
     ],

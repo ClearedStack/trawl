@@ -10,51 +10,99 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/ClearedStack/trawl/internal/errs"
 )
 
-// The provisional wire format: every call is a POST of a JSON object to one
-// of these paths. The contract version travels in a header, and the caller
-// proves who it is with its Kubernetes ServiceAccount token as a bearer
-// token.
 const (
 	pathLease        = "/v1/lease"
 	pathHeartbeat    = "/v1/heartbeat"
-	pathLookup       = "/v1/lookup"
-	pathRate         = "/v1/rate"
 	pathComplete     = "/v1/complete"
 	pathFail         = "/v1/fail"
 	pathNeedsSubtool = "/v1/needs_subtool"
+	pathItems        = "/v1/items"
 
-	versionHeader = "Contract-Version"
-
-	// maxResponse bounds how much of a hub response is read.
-	maxResponse = 512 << 10
+	// maxRequest is the largest request body the hub accepts.
+	maxRequest = 64 << 10
+	// maxResponse bounds how much of a hub answer is read.
+	maxResponse = 256 << 10
 )
 
-type leaseRequest struct {
-	Worker string `json:"worker"`
-	Lane   Lane   `json:"lane"`
-}
+// The request bodies. Each holds exactly the fields of its call.
 
-type leaseResponse struct {
-	Item *Item `json:"item"`
+type leaseRequest struct {
+	Contract string `json:"contract"`
 }
 
 type heartbeatRequest struct {
-	LeaseID string `json:"lease_id"`
+	Contract string `json:"contract"`
+	Lease    string `json:"lease"`
 }
 
-type lookupRequest struct {
-	Hashes []string `json:"hashes"`
+type completeRequest struct {
+	Contract string `json:"contract"`
+	Lease    string `json:"lease"`
+	State    string `json:"state"`
+	Result   any    `json:"result,omitempty"`
 }
 
-type rateRequest struct {
-	Key    string `json:"key"`
-	Member string `json:"member"`
+type failRequest struct {
+	Contract string    `json:"contract"`
+	Lease    string    `json:"lease"`
+	Code     errs.Code `json:"code"`
 }
 
-type rateResponse struct {
-	Count int `json:"count"`
+type needsSubtoolRequest struct {
+	Contract string `json:"contract"`
+	Lease    string `json:"lease"`
+}
+
+type itemsRequest struct {
+	Contract string `json:"contract"`
+	Source   string `json:"source"`
+	Title    string `json:"title"`
+	Address  string `json:"address"`
+	Result   any    `json:"result,omitempty"`
+}
+
+type itemsResponse struct {
+	ID        string `json:"id"`
+	Duplicate bool   `json:"duplicate"`
+}
+
+// Refusal is a refused call: the HTTP status with the code and cause from
+// the hub's answer. The hub's sentence is not kept. Use errors.Is with
+// ErrUnavailable, ErrConflict or ErrRefused to learn what to do about it.
+type Refusal struct {
+	Status int
+	Code   errs.Code
+	Cause  string
+}
+
+func (r *Refusal) Error() string {
+	text := "hub refused the call with status " + http.StatusText(r.Status)
+	if r.Code.Valid() {
+		text += " " + string(r.Code)
+	}
+	if r.Cause != "" {
+		text += " cause=" + r.Cause
+	}
+	return text
+}
+
+// Is sorts a refusal into one of the three errors of this package.
+func (r *Refusal) Is(target error) bool {
+	switch {
+	case r.Status == http.StatusConflict:
+		return target == ErrConflict
+	case r.Status == http.StatusUnauthorized, r.Status == http.StatusForbidden,
+		r.Status == http.StatusTooManyRequests, r.Status >= 500:
+		// A token the hub does not accept yet, a busy hub and a failing
+		// hub all call for the same thing: keep the work and try later.
+		return target == ErrUnavailable
+	default:
+		return target == ErrRefused
+	}
 }
 
 // HTTP is a Client that talks to the hub over cluster-private HTTP.
@@ -86,19 +134,22 @@ func NewHTTP(base, tokenFile string, timeout time.Duration) (*HTTP, error) {
 	}, nil
 }
 
-// call posts in and decodes the reply into out. It maps every outcome to
-// one of the package errors, so no address or token can reach a caller.
-func (h *HTTP) call(ctx context.Context, path string, in, out any) (status int, err error) {
+// Base returns the hub address this client was given.
+func (h *HTTP) Base() string { return h.base }
+
+// call posts in and decodes a 200 or 201 answer into out. Every failure
+// becomes ErrUnavailable or a *Refusal, so no address or token can reach a
+// caller.
+func (h *HTTP) call(ctx context.Context, path string, in, out any) (int, error) {
 	body, err := json.Marshal(in)
-	if err != nil {
-		return 0, ErrProtocol
+	if err != nil || len(body) > maxRequest {
+		return 0, &Refusal{Status: http.StatusRequestEntityTooLarge}
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, h.base+path, bytes.NewReader(body))
 	if err != nil {
-		return 0, ErrProtocol
+		return 0, ErrUnavailable
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(versionHeader, ContractVersion)
 	if h.tokenFile != "" {
 		token, err := os.ReadFile(h.tokenFile)
 		if err != nil {
@@ -113,202 +164,106 @@ func (h *HTTP) call(ctx context.Context, path string, in, out any) (status int, 
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(io.LimitReader(resp.Body, maxResponse+1))
-	if err != nil {
+	if err != nil || len(data) > maxResponse {
 		return 0, ErrUnavailable
 	}
 
-	switch {
-	case resp.StatusCode == http.StatusOK:
-		if len(data) > maxResponse {
-			return 0, ErrProtocol
-		}
+	switch resp.StatusCode {
+	case http.StatusOK, http.StatusCreated:
 		if out != nil {
 			if err := json.Unmarshal(data, out); err != nil {
-				return 0, ErrProtocol
+				return 0, ErrUnavailable
 			}
 		}
 		return resp.StatusCode, nil
-	case resp.StatusCode == http.StatusNoContent:
+	case http.StatusNoContent:
 		return resp.StatusCode, nil
-	case resp.StatusCode == http.StatusConflict:
-		return 0, ErrConflict
-	case resp.StatusCode == http.StatusGone:
-		return 0, ErrGone
-	case resp.StatusCode >= 500, resp.StatusCode == http.StatusTooManyRequests:
-		return 0, ErrUnavailable
-	default:
-		return 0, ErrProtocol
 	}
+
+	refusal := &Refusal{Status: resp.StatusCode}
+	var answer struct {
+		Error string `json:"error"`
+		Cause string `json:"cause"`
+	}
+	if json.Unmarshal(data, &answer) == nil {
+		if code := errs.Code(answer.Error); code.Valid() {
+			refusal.Code = code
+		}
+		refusal.Cause = safeToken(answer.Cause)
+	}
+	return 0, refusal
 }
 
-func (h *HTTP) Lease(ctx context.Context, lane Lane) (*Item, error) {
-	var resp leaseResponse
-	status, err := h.call(ctx, pathLease, leaseRequest{Worker: Worker, Lane: lane}, &resp)
+// safeToken keeps a cause only if it is a short lowercase identifier, so
+// that nothing the hub sends can carry data into a log line.
+func safeToken(s string) string {
+	if s == "" || len(s) > 40 {
+		return ""
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if !(c >= 'a' && c <= 'z') && !(c >= '0' && c <= '9') && c != '_' && c != '-' {
+			return ""
+		}
+	}
+	return s
+}
+
+func (h *HTTP) Lease(ctx context.Context) (*Lease, error) {
+	var lease Lease
+	status, err := h.call(ctx, pathLease, leaseRequest{Contract: ContractVersion}, &lease)
 	if err != nil {
 		return nil, err
 	}
-	if status == http.StatusNoContent || resp.Item == nil {
+	if status == http.StatusNoContent {
 		return nil, nil
 	}
-	if resp.Item.LeaseID == "" || resp.Item.ItemID == "" {
-		return nil, ErrProtocol
+	if status != http.StatusOK || lease.Lease == "" || lease.ID == "" {
+		return nil, ErrUnavailable
 	}
-	return resp.Item, nil
+	return &lease, nil
 }
 
-func (h *HTTP) Heartbeat(ctx context.Context, leaseID string) error {
-	_, err := h.call(ctx, pathHeartbeat, heartbeatRequest{LeaseID: leaseID}, nil)
+func (h *HTTP) Heartbeat(ctx context.Context, lease string) error {
+	_, err := h.call(ctx, pathHeartbeat, heartbeatRequest{Contract: ContractVersion, Lease: lease}, nil)
 	return err
 }
 
-func (h *HTTP) Lookup(ctx context.Context, hashes []string) (LookupResult, error) {
-	var res LookupResult
-	status, err := h.call(ctx, pathLookup, lookupRequest{Hashes: hashes}, &res)
+func (h *HTTP) Complete(ctx context.Context, lease, state string, result any) error {
+	_, err := h.call(ctx, pathComplete, completeRequest{Contract: ContractVersion, Lease: lease, State: state, Result: result}, nil)
+	return err
+}
+
+func (h *HTTP) Fail(ctx context.Context, lease string, code errs.Code) error {
+	_, err := h.call(ctx, pathFail, failRequest{Contract: ContractVersion, Lease: lease, Code: code}, nil)
+	return err
+}
+
+func (h *HTTP) NeedsSubtool(ctx context.Context, lease string) error {
+	_, err := h.call(ctx, pathNeedsSubtool, needsSubtoolRequest{Contract: ContractVersion, Lease: lease}, nil)
+	return err
+}
+
+func (h *HTTP) File(ctx context.Context, f Filing) (Filed, error) {
+	var answer itemsResponse
+	status, err := h.call(ctx, pathItems, itemsRequest{
+		Contract: ContractVersion,
+		Source:   f.Source,
+		Title:    f.Title,
+		Address:  f.Address,
+		Result:   f.Result,
+	}, &answer)
 	if err != nil {
-		return LookupResult{}, err
+		return Filed{}, err
 	}
-	if status != http.StatusOK || res.LastSeq < 0 {
-		return LookupResult{}, ErrProtocol
+	switch {
+	case status == http.StatusCreated:
+		return Filed{New: true, ID: answer.ID}, nil
+	case status == http.StatusOK && answer.Duplicate:
+		return Filed{New: false, ID: answer.ID}, nil
+	default:
+		// 200 without "duplicate": true, or 204: not an answer the
+		// contract defines, so nothing is concluded from it.
+		return Filed{}, ErrUnavailable
 	}
-	if res.Known == nil {
-		res.Known = map[string]string{}
-	}
-	return res, nil
-}
-
-func (h *HTTP) Rate(ctx context.Context, key, member string) (int, error) {
-	var res rateResponse
-	status, err := h.call(ctx, pathRate, rateRequest{Key: key, Member: member}, &res)
-	if err != nil {
-		return 0, err
-	}
-	if status != http.StatusOK || res.Count < 1 {
-		return 0, ErrProtocol
-	}
-	return res.Count, nil
-}
-
-func (h *HTTP) Complete(ctx context.Context, c Completion) error {
-	_, err := h.call(ctx, pathComplete, c, nil)
-	return err
-}
-
-func (h *HTTP) Fail(ctx context.Context, f Failure) error {
-	_, err := h.call(ctx, pathFail, f, nil)
-	return err
-}
-
-func (h *HTTP) NeedsSubtool(ctx context.Context, f Failure) error {
-	_, err := h.call(ctx, pathNeedsSubtool, f, nil)
-	return err
-}
-
-// Handler serves the provisional wire format from the stand-in, so the
-// HTTP client can be tested against it. When token is not empty, calls
-// must carry it as a bearer token.
-func (m *Memory) Handler(token string) http.Handler {
-	mux := http.NewServeMux()
-	handle := func(path string, fn func(ctx context.Context, body []byte) (any, error)) {
-		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-			if r.Method != http.MethodPost || r.Header.Get(versionHeader) != ContractVersion {
-				http.Error(w, "", http.StatusBadRequest)
-				return
-			}
-			if token != "" && r.Header.Get("Authorization") != "Bearer "+token {
-				http.Error(w, "", http.StatusUnauthorized)
-				return
-			}
-			body, err := io.ReadAll(io.LimitReader(r.Body, maxResponse))
-			if err != nil {
-				http.Error(w, "", http.StatusBadRequest)
-				return
-			}
-			out, err := fn(r.Context(), body)
-			switch {
-			case errors.Is(err, ErrUnavailable):
-				http.Error(w, "", http.StatusServiceUnavailable)
-			case errors.Is(err, ErrConflict):
-				http.Error(w, "", http.StatusConflict)
-			case errors.Is(err, ErrGone):
-				http.Error(w, "", http.StatusGone)
-			case err != nil:
-				http.Error(w, "", http.StatusBadRequest)
-			case out == nil:
-				w.WriteHeader(http.StatusNoContent)
-			default:
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(out)
-			}
-		})
-	}
-	decode := func(body []byte, v any) error {
-		dec := json.NewDecoder(bytes.NewReader(body))
-		dec.DisallowUnknownFields()
-		if err := dec.Decode(v); err != nil {
-			return ErrProtocol
-		}
-		return nil
-	}
-
-	handle(pathLease, func(ctx context.Context, body []byte) (any, error) {
-		var req leaseRequest
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		if req.Worker != Worker {
-			return nil, ErrProtocol
-		}
-		item, err := m.Lease(ctx, req.Lane)
-		if err != nil || item == nil {
-			return nil, err
-		}
-		return leaseResponse{Item: item}, nil
-	})
-	handle(pathHeartbeat, func(ctx context.Context, body []byte) (any, error) {
-		var req heartbeatRequest
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		return nil, m.Heartbeat(ctx, req.LeaseID)
-	})
-	handle(pathLookup, func(ctx context.Context, body []byte) (any, error) {
-		var req lookupRequest
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		return m.Lookup(ctx, req.Hashes)
-	})
-	handle(pathRate, func(ctx context.Context, body []byte) (any, error) {
-		var req rateRequest
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		n, err := m.Rate(ctx, req.Key, req.Member)
-		if err != nil {
-			return nil, err
-		}
-		return rateResponse{Count: n}, nil
-	})
-	handle(pathComplete, func(ctx context.Context, body []byte) (any, error) {
-		var req Completion
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		return nil, m.Complete(ctx, req)
-	})
-	handle(pathFail, func(ctx context.Context, body []byte) (any, error) {
-		var req Failure
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		return nil, m.Fail(ctx, req)
-	})
-	handle(pathNeedsSubtool, func(ctx context.Context, body []byte) (any, error) {
-		var req Failure
-		if err := decode(body, &req); err != nil {
-			return nil, err
-		}
-		return nil, m.NeedsSubtool(ctx, req)
-	})
-	return mux
 }

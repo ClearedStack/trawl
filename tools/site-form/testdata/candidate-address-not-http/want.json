@@ -1,0 +1,12 @@
+{
+  "result": {
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "site-form",
+        "reason": "scheme_not_public",
+        "fingerprint": "5b2d891ca66b"
+      }
+    ]
+  }
+}

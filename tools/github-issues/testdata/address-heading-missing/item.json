@@ -1,6 +1,4 @@
 {
-  "item_id": "issues-address-heading-missing",
   "source": "github-issues",
-  "format": "github-issues.v1",
-  "observed_at": "2031-03-04T05:06:07Z"
+  "format": "github-issues.v1"
 }

@@ -1,9 +1,0 @@
-{
-  "version": 1,
-  "fields": {
-    "title": { "owner": "listing", "max": 120 },
-    "summary": { "owner": "listing", "max": 600 },
-    "category": { "owner": "listing", "max": 60 },
-    "address": { "owner": "listing", "max": 2048, "type": "url" }
-  }
-}

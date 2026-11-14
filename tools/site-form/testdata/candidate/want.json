@@ -1,15 +1,13 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://tools.agency-example.gov/wage",
-        "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
-        "kind": "submission",
+        "address": "https://tools.agency-example.gov/wage",
         "title": "Wage calculator",
-        "via": "site-form"
+        "kind": "submission",
+        "via": "site-form",
+        "changed": true
       }
-    ],
-    "rate_key": "site-form/2031-03-04/b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1",
-    "rate_limit": 5
+    ]
   }
 }

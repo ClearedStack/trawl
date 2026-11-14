@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ClearedStack/trawl/internal/dedupe"
 	"github.com/ClearedStack/trawl/internal/errs"
 	"github.com/ClearedStack/trawl/internal/tool"
 )
@@ -26,22 +25,22 @@ func TestProcess(t *testing.T) {
 			{URL: "https://docs.agency-example.gov/guide", Title: "(CUI) made-up guide"},
 			{URL: "https://calc.depot-example.mil/rates"},
 		},
-		Rejects:   []*errs.Error{errs.New(errs.Parse, "bad_entry", []byte("x"))},
-		Proposals: []tool.Proposal{{Target: "PA-0001", Field: "title", Value: "New"}},
-		RateKey:   "k",
-		RateLimit: 5,
+		Rejects: []*errs.Error{errs.New(errs.Parse, "bad_entry", []byte("x"))},
 	}
 	res, err := Process(fake{out: out}, tool.Input{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(res.Entries) != 2 {
-		t.Fatalf("entries = %+v", res.Entries)
+	if len(res.Candidates) != 2 {
+		t.Fatalf("candidates = %+v", res.Candidates)
 	}
-	first := res.Entries[0]
-	if first.URL != "https://tools.agency-example.gov/wage" || first.SHA256 != dedupe.Hash(first.URL) ||
+	first := res.Candidates[0]
+	if first.Address != "https://tools.agency-example.gov/wage" || !first.Changed ||
 		first.Title != "Wage calculator" || first.Via != "made-up#1" || first.Kind != "tool" {
-		t.Errorf("first entry = %+v", first)
+		t.Errorf("first candidate = %+v", first)
+	}
+	if second := res.Candidates[1]; second.Address != "https://calc.depot-example.mil/rates" || second.Changed {
+		t.Errorf("second candidate = %+v", second)
 	}
 	if len(res.Rejects) != 3 {
 		t.Fatalf("rejects = %+v", res.Rejects)
@@ -52,9 +51,6 @@ func TestProcess(t *testing.T) {
 		if reasons[i] != want[i] || res.Rejects[i].Tool != "made-up" || res.Rejects[i].Code != errs.Parse {
 			t.Errorf("reject %d = %+v, want reason %s", i, res.Rejects[i], want[i])
 		}
-	}
-	if len(res.Proposals) != 1 || res.RateKey != "k" || res.RateLimit != 5 {
-		t.Errorf("result = %+v", res)
 	}
 }
 

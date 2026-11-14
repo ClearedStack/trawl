@@ -1,9 +1,0 @@
-{
-  "kind": "edit",
-  "target": "PA-0007",
-  "field": "score",
-  "value": "100",
-  "website": "",
-  "pow": {"challenge": "made-up-challenge-02", "nonce": "209723"},
-  "ip_hash": "f34a8536827d64513a5054453f4a6eeb73729d65e80421e104c78c950d716c0b"
-}

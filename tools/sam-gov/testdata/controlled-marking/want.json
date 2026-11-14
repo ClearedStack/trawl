@@ -1,11 +1,10 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://example.org/kept",
-        "sha256": "db9eb4c6236ec75fbeff751a2ec28f6ec3bf7f50a38a66115f10d8619684f14c",
-        "kind": "link",
+        "address": "https://example.org/kept",
         "title": "Made-up notice: clean",
+        "kind": "link",
         "via": "sam-gov:0000000000000000000000000000a00e"
       }
     ],
