@@ -1,9 +1,0 @@
-{
-  "kind": "edit",
-  "target": "PA-0007",
-  "field": "summary",
-  "value": "Works out a made-up wage floor.\nNow covers \u003ci\u003etwo\u003c/i\u003e more regions.",
-  "website": "",
-  "pow": {"challenge": "made-up-challenge-02", "nonce": "261591"},
-  "ip_hash": "f34a8536827d64513a5054453f4a6eeb73729d65e80421e104c78c950d716c0b"
-}

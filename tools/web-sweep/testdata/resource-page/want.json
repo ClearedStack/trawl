@@ -1,60 +1,56 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://www.agency-example.gov/tools/wage-floor",
-        "sha256": "9d20d69d62a4443fae176d7137f3c2ecb6948aa3e5d4802c161d1837aafb8cf5",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/tools/wage-floor",
         "title": "Wage floor calculator",
-        "via": "https://www.agency-example.gov/small-business/resources"
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
       },
       {
-        "url": "https://www.agency-example.gov/small-business/estimators",
-        "sha256": "9f1809f07e7693b6b43e434653f196dd0c29d29a1733b504b66f1b4209dbcd76",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/small-business/estimators",
         "title": "Cost estimators",
-        "via": "https://www.agency-example.gov/small-business/resources"
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
       },
       {
-        "url": "https://www.agency-example.gov/forms",
-        "sha256": "7908076efd5c0f1267fd1d9a540003a544715a9104d7b6356043376e2cd977a2",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/forms",
         "title": "Forms library",
-        "via": "https://www.agency-example.gov/small-business/resources"
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
       },
       {
-        "url": "https://calc.depot-example.mil/rates",
-        "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-        "kind": "link",
+        "address": "https://calc.depot-example.mil/rates",
         "title": "Depot rate lookup",
-        "via": "https://www.agency-example.gov/small-business/resources"
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
       },
       {
-        "url": "https://vendor.example.com/products/proposal-builder",
-        "sha256": "589eb9bce0913416f9690d31904a27bd365eb88d9a551f5800b6b798b33c4e42",
-        "kind": "link",
+        "address": "https://vendor.example.com/products/proposal-builder",
         "title": "A made-up vendor product",
+        "kind": "link",
         "via": "https://www.agency-example.gov/small-business/resources"
       },
       {
-        "url": "https://www.agency-example.gov/downloads/readiness.pdf",
-        "sha256": "3c75147acf4105dc885119113e313b556f326ae2d14c594da6a8e7f25a5f6f28",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/downloads/readiness.pdf",
         "title": "Readiness checklist (PDF)",
+        "kind": "link",
         "via": "https://www.agency-example.gov/small-business/resources"
       },
       {
-        "url": "https://www.agency-example.gov/tools/wage-floor",
-        "sha256": "9d20d69d62a4443fae176d7137f3c2ecb6948aa3e5d4802c161d1837aafb8cf5",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/tools/wage-floor",
         "title": "Wage floor tool, again",
+        "kind": "link",
         "via": "https://www.agency-example.gov/small-business/resources"
       },
       {
-        "url": "https://www.agency-example.gov/search?q=a&sort=new",
-        "sha256": "1eb6042a98b3a1122f7bbc7eba731b2666bdececfb519d333bd0dc72cb02e885",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/search?q=a&sort=new",
         "title": "Search finder",
+        "kind": "link",
         "via": "https://www.agency-example.gov/small-business/resources"
       }
     ]

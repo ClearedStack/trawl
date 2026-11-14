@@ -36,31 +36,17 @@ func TestFormatAndParseID(t *testing.T) {
 }
 
 func TestDecide(t *testing.T) {
-	entries := []Entry{
-		{URL: "https://a.example.com/", SHA256: "h-a", Via: "one"},
-		{URL: "https://b.example.com/", SHA256: "h-b", Via: "two"},
-		{URL: "https://a.example.com/", SHA256: "h-a", Via: "three"},
-		{URL: "https://c.example.com/", SHA256: "h-c", Via: "four"},
-		{URL: "https://b.example.com/", SHA256: "h-b", Via: "five"},
+	const a, b, c = "https://a.example.com/", "https://b.example.com/", "https://c.example.com/"
+	known := map[string]string{Hash(b): "PA-0003"}
+	got := Decide([]string{a, b, a, c, b}, known, 7)
+	want := []Record{
+		{ID: "PA-0008", SHA256: Hash(a), URL: a},
+		{ID: "PA-0009", SHA256: Hash(c), URL: c},
 	}
-	known := map[string]string{"h-b": "PA-0003"}
-	records, sightings := Decide(entries, known, 7)
-	wantRecords := []Record{
-		{ID: "PA-0008", SHA256: "h-a", URL: "https://a.example.com/", Via: "one"},
-		{ID: "PA-0009", SHA256: "h-c", URL: "https://c.example.com/", Via: "four"},
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("records = %+v", got)
 	}
-	wantSightings := []Sighting{{ID: "PA-0003", SHA256: "h-b", Via: "two"}}
-	if !reflect.DeepEqual(records, wantRecords) {
-		t.Errorf("records = %+v", records)
-	}
-	if !reflect.DeepEqual(sightings, wantSightings) {
-		t.Errorf("sightings = %+v", sightings)
-	}
-}
-
-func TestDecideNothing(t *testing.T) {
-	records, sightings := Decide(nil, nil, 0)
-	if records != nil || sightings != nil {
-		t.Fatal("expected no output for no input")
+	if Decide(nil, nil, 0) != nil {
+		t.Error("expected no output for no input")
 	}
 }

@@ -11,15 +11,15 @@ import (
 	"testing"
 
 	"github.com/ClearedStack/trawl/internal/muster"
+	"github.com/ClearedStack/trawl/internal/worker"
 )
 
 // budgetKiB is the memory Trawl may use: 30 MiB.
 const budgetKiB = 30 * 1024
 
-// TestWorkStaysWithinMemoryBudget builds the real binary, lets it drain a
-// large batch from the stand-in hub over HTTP, and checks the most memory
-// the process ever held against the 30 MiB budget. The batch includes
-// inline documents close to the largest size accepted.
+// TestWorkStaysWithinMemoryBudget builds the real binary, lets it record a
+// large batch of discovered items from the fake hub over HTTP, and checks
+// the most memory the process ever held against the 30 MiB budget.
 func TestWorkStaysWithinMemoryBudget(t *testing.T) {
 	if testing.Short() {
 		t.Skip("builds and runs the binary")
@@ -31,55 +31,27 @@ func TestWorkStaysWithinMemoryBudget(t *testing.T) {
 		t.Fatalf("build failed: %v\n%s", err, out)
 	}
 
-	hub := muster.NewMemory()
-	const observed = "2031-03-04T05:06:07Z"
-	wantRecords := 0
-
-	// Many small items: lists of made-up issue suggestions.
-	for i := 0; i < 150; i++ {
-		var issues []map[string]any
-		for j := 0; j < 20; j++ {
-			issues = append(issues, map[string]any{
-				"number": i*100 + j + 1,
-				"labels": []map[string]string{{"name": "tool-suggestion"}},
-				"body":   fmt.Sprintf("### Tool address\n\nhttps://tools.agency-example.gov/batch/%d/%d\n\n### Tool name\n\nMade-up tool %d-%d\n", i, j, i, j),
-			})
-			wantRecords++
-		}
-		payload, _ := json.Marshal(issues)
-		hub.Enqueue(muster.Normal, muster.Item{ItemID: fmt.Sprintf("issues-%d", i), Source: "github-issues", Format: "github-issues.v1", Payload: payload, ObservedAt: observed})
+	const token = "made-up-token-for-trawl"
+	hub := muster.NewFake(map[string]string{token: "trawl"})
+	const items = 2000
+	for i := 0; i < items; i++ {
+		address := fmt.Sprintf("https://tools.agency-example.gov/batch/%d", i)
+		rec, _ := json.Marshal(worker.Record{Source: "web-sweep", Address: address, Title: fmt.Sprintf("Made-up tool %d", i), Kind: "link", Via: "https://www.agency-example.gov/resources"})
+		hub.Seed(muster.FakeItem{State: muster.StateDiscovered, Next: "trawl", Lane: "backfill", Source: "web-sweep", Title: fmt.Sprintf("Made-up tool %d", i), Address: address, Results: map[string]json.RawMessage{"trawl": rec}})
 	}
+	// One candidate from the site's form, as the hub records it.
+	hub.Seed(muster.FakeItem{State: muster.StateDiscovered, Next: "trawl", Source: "site-form", Title: "Wage calculator", Address: "https://tools.agency-example.gov/wage"})
 
-	// A few items near the largest inline size: pages of made-up notices.
-	filler := strings.Repeat("Made-up description text. ", 60)
-	for i := 0; i < 6; i++ {
-		var notices []map[string]any
-		for j := 0; j < 120; j++ {
-			var links []string
-			for k := 0; k < 6; k++ {
-				links = append(links, fmt.Sprintf("https://notices.agency-example.gov/files/%d/%d/%d.pdf", i, j, k))
-				wantRecords++
-			}
-			notices = append(notices, map[string]any{
-				"noticeId":      fmt.Sprintf("%032x", i*1000+j),
-				"title":         "Made-up notice",
-				"description":   filler,
-				"resourceLinks": links,
-			})
-		}
-		payload, _ := json.Marshal(map[string]any{"totalRecords": len(notices), "opportunitiesData": notices})
-		if len(payload) < 200<<10 || len(payload) > 256<<10 {
-			t.Fatalf("large item is %d bytes; it should sit just under the inline limit", len(payload))
-		}
-		hub.Enqueue(muster.Backfill, muster.Item{ItemID: fmt.Sprintf("notices-%d", i), Source: "sam-gov", Format: "sam-gov.opportunities.v2", Payload: payload, ObservedAt: observed})
-	}
-
-	srv := httptest.NewServer(hub.Handler(""))
+	srv := httptest.NewServer(hub)
 	defer srv.Close()
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	if err := os.WriteFile(tokenFile, []byte(token+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
-	cmd := exec.Command(bin, "work", "-muster-url", srv.URL, "-token-file", "", "-spool", filepath.Join(t.TempDir(), "spool"), "-drain")
-	// A directory the process cannot write to, to show that the spool
-	// is the only place it needs.
+	cmd := exec.Command(bin, "work", "-muster-url", srv.URL, "-token-file", tokenFile, "-spool", filepath.Join(t.TempDir(), "spool"), "-drain")
+	// A directory the process has no business writing to, with no home
+	// and no temporary directory: the spool is the only place it needs.
 	cmd.Dir = "/"
 	cmd.Env = []string{"HOME=/nonexistent", "TMPDIR=/nonexistent"}
 	out, err := cmd.CombinedOutput()
@@ -87,13 +59,19 @@ func TestWorkStaysWithinMemoryBudget(t *testing.T) {
 		t.Fatalf("trawl work failed: %v\n%s", err, out)
 	}
 
-	snap := hub.Snapshot()
-	if len(snap.Records) != wantRecords {
-		t.Errorf("%d records, want %d", len(snap.Records), wantRecords)
+	recorded := 0
+	for _, it := range hub.Items() {
+		if it.State != muster.StateRecorded || it.Next != "sextant" {
+			t.Fatalf("%s ended as %s", it.ID, it.State)
+		}
+		recorded++
 	}
-	for _, it := range snap.Items {
-		if it.State != muster.StateCompleted {
-			t.Errorf("%s ended as %s", it.ItemID, it.State)
+	if recorded != items+1 {
+		t.Errorf("%d items recorded, want %d", recorded, items+1)
+	}
+	for _, call := range hub.Calls() {
+		if call.Status >= 400 {
+			t.Fatalf("the hub refused %s with %d: %s", call.Path, call.Status, call.Body)
 		}
 	}
 
@@ -113,8 +91,66 @@ func TestWorkStaysWithinMemoryBudget(t *testing.T) {
 	if peakKiB == 0 {
 		t.Skip("peak memory is not reported on this system")
 	}
-	t.Logf("peak memory %d KiB of %d KiB allowed, %d records", peakKiB, budgetKiB, len(snap.Records))
+	t.Logf("peak memory %d KiB of %d KiB allowed, %d items recorded", peakKiB, budgetKiB, recorded)
 	if peakKiB > budgetKiB {
 		t.Errorf("peak memory %d KiB is over the %d KiB budget", peakKiB, budgetKiB)
+	}
+}
+
+func TestWorkRefusesBadSettings(t *testing.T) {
+	sources := filepath.Join(t.TempDir(), "sources.json")
+	os.WriteFile(sources, []byte(`{"sources": [{"source": "web-sweep", "format": "web-sweep.page.v1", "fetch": "http://localhost/"}]}`), 0o600)
+	cases := map[string][]string{
+		"no hub address":        {"work"},
+		"hub without a scheme":  {"work", "-muster-url", "hub.made-up.svc:8080", "-spool", t.TempDir()},
+		"stray argument":        {"work", "-muster-url", "http://hub.made-up.svc", "extra"},
+		"sources file missing":  {"work", "-muster-url", "http://hub.made-up.svc", "-sources", filepath.Join(t.TempDir(), "absent.json")},
+		"source not public":     {"work", "-muster-url", "http://hub.made-up.svc", "-sources", sources},
+		"negative sweep period": {"work", "-muster-url", "http://hub.made-up.svc", "-sweep-every", "-1h"},
+	}
+	for name, args := range cases {
+		var out, errOut strings.Builder
+		if status := run(args, strings.NewReader(""), &out, &errOut); status != 2 {
+			t.Errorf("%s: exit status %d", name, status)
+		}
+	}
+}
+
+func TestWorkReadsEnvironmentAndChecksContract(t *testing.T) {
+	t.Setenv("CONTRACT_VERSION", "v2")
+	var out, errOut strings.Builder
+	if status := run([]string{"work", "-muster-url", "http://hub.made-up.svc"}, strings.NewReader(""), &out, &errOut); status != 2 {
+		t.Fatalf("wrong CONTRACT_VERSION accepted: status %d", status)
+	}
+	t.Setenv("CONTRACT_VERSION", "v1")
+	t.Setenv("TRAWL_SWEEP_EVERY", "not-a-duration")
+	if status := run([]string{"work", "-muster-url", "http://hub.made-up.svc"}, strings.NewReader(""), &out, &errOut); status != 2 {
+		t.Fatalf("bad TRAWL_SWEEP_EVERY accepted: status %d", status)
+	}
+	t.Setenv("TRAWL_SWEEP_EVERY", "0s")
+
+	const token = "made-up-token-for-trawl"
+	hub := muster.NewFake(map[string]string{token: "trawl"})
+	hub.Seed(muster.FakeItem{State: muster.StateDiscovered, Next: "trawl", Source: "site-form", Title: "Wage calculator", Address: "https://tools.agency-example.gov/wage"})
+	srv := httptest.NewServer(hub)
+	defer srv.Close()
+
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	if err := os.WriteFile(tokenFile, []byte(token+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	sourcesFile := filepath.Join(t.TempDir(), "sources.json")
+	if err := os.WriteFile(sourcesFile, []byte(`{"sources": []}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("MUSTER_URL", srv.URL)
+	t.Setenv("TRAWL_TOKEN_FILE", tokenFile)
+	t.Setenv("TRAWL_SPOOL_DIR", filepath.Join(t.TempDir(), "spool"))
+	t.Setenv("TRAWL_SOURCES", sourcesFile)
+	if status := run([]string{"work", "-drain"}, strings.NewReader(""), &out, &errOut); status != 0 {
+		t.Fatalf("work from environment failed with %d: %s", status, errOut.String())
+	}
+	if items := hub.Items(); len(items) != 1 || items[0].State != muster.StateRecorded {
+		t.Fatalf("items = %+v", items)
 	}
 }

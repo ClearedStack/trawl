@@ -45,18 +45,40 @@ func TestParseRule(t *testing.T) {
 
 func TestParseRuleRefuses(t *testing.T) {
 	bad := map[string]string{
-		"unknown key":  ruleYAML + "extra: 1\n",
-		"no formats":   "tool: a\nmatch:\n  source: a\ninput: inline\n",
-		"empty format": "tool: a\nmatch:\n  source: a\n  formats: ['']\ninput: inline\n",
-		"bad input":    "tool: a\nmatch:\n  source: a\n  formats: [x]\ninput: sometimes\n",
-		"no tool":      "match:\n  source: a\n  formats: [x]\ninput: inline\n",
-		"two docs":     ruleYAML + "---\ntool: b\n",
-		"not yaml":     ":\n  - [",
+		"unknown key":        ruleYAML + "extra: word\n",
+		"unknown nested key": "tool: a\nmatch:\n  source: a\n  formats:\n    - x\n  extra: word\ninput: inline\n",
+		"no formats":         "tool: a\nmatch:\n  source: a\ninput: inline\n",
+		"flow list":          "tool: a\nmatch:\n  source: a\n  formats: [x]\ninput: inline\n",
+		"quoted value":       "tool: 'a'\nmatch:\n  source: a\n  formats:\n    - x\ninput: inline\n",
+		"bad input":          "tool: a\nmatch:\n  source: a\n  formats:\n    - x\ninput: sometimes\n",
+		"no tool":            "match:\n  source: a\n  formats:\n    - x\ninput: inline\n",
+		"two documents":      ruleYAML + "---\ntool: b\n",
+		"repeated key":       ruleYAML + "tool: again\n",
+		"tab":                "tool:\ta\n",
+		"value and block":    "tool: a\n  more: b\n",
+		"odd indentation":    "tool: a\nmatch:\n   source: a\n",
+		"list as value":      "tool:\n  - a\nmatch:\n  source: a\n  formats:\n    - x\ninput: inline\n",
+		"word yaml retypes":  "tool: yes\nmatch:\n  source: a\n  formats:\n    - x\ninput: inline\n",
+		"number":             "tool: 7\nmatch:\n  source: a\n  formats:\n    - x\ninput: inline\n",
+		"empty":              "# nothing here\n",
+		"not yaml":           ":\n  - [",
 	}
 	for name, text := range bad {
 		if _, err := ParseRule([]byte(text)); err == nil {
 			t.Errorf("%s: accepted", name)
 		}
+	}
+}
+
+func TestParseYAMLShapes(t *testing.T) {
+	doc, err := parseYAML([]byte("# comment\na: one\n\nb:\n  c: two\n  d:\n    - x.v1\n    - y/z\n  e:\n    f: three\ng: four\r\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := doc["b"].(map[string]node)
+	if doc["a"] != "one" || doc["g"] != "four" || b["c"] != "two" ||
+		strings.Join(b["d"].([]string), ",") != "x.v1,y/z" || b["e"].(map[string]node)["f"] != "three" {
+		t.Errorf("doc = %#v", doc)
 	}
 }
 
@@ -68,7 +90,7 @@ func TestParseRegistry(t *testing.T) {
 	if r.Contract != "v1" || strings.Join(r.Tools, ",") != "a,b" {
 		t.Errorf("registry = %+v", r)
 	}
-	for _, bad := range []string{"tools: [a]\n", "contract: v1\n", "contract: v1\ntools: [a]\nmore: 1\n"} {
+	for _, bad := range []string{"tools:\n  - a\n", "contract: v1\n", "contract: v1\ntools:\n  - a\nmore: word\n", "contract: v1\ntools: a\n"} {
 		if _, err := ParseRegistry([]byte(bad)); err == nil {
 			t.Errorf("accepted %q", bad)
 		}
@@ -112,6 +134,24 @@ func TestSetMatch(t *testing.T) {
 	e, ok = errs.As(err)
 	if !ok || e.Code != errs.NeedsSubtool || e.Reason != "ambiguous_rule" {
 		t.Fatalf("two matching rules: %v", err)
+	}
+}
+
+func TestSetSource(t *testing.T) {
+	set, err := NewSet(entry("one", "s1", "f1"), entry("two", "s2", "f2"), entry("twin", "s2", "f3"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := set.Source("s1"); err != nil || got.Tool.Name() != "one" {
+		t.Fatalf("Source = %v, %v", got, err)
+	}
+	_, err = set.Source("s9")
+	if e, ok := errs.As(err); !ok || e.Code != errs.NeedsSubtool || e.Reason != "no_matching_rule" {
+		t.Errorf("unknown source: %v", err)
+	}
+	_, err = set.Source("s2")
+	if e, ok := errs.As(err); !ok || e.Code != errs.NeedsSubtool || e.Reason != "ambiguous_rule" {
+		t.Errorf("two rules for one source: %v", err)
 	}
 }
 

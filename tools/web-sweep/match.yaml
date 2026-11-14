@@ -1,7 +1,6 @@
 # web-sweep handles one page of a scheduled sweep over public contracting
-# sites. The item names the page; Trawl reads it, after asking the site's
-# robots.txt, and looks for links to tools and paperwork. A sweep item
-# never carries its document inline.
+# sites. The sources file names the page; Trawl reads it, after asking the
+# site's robots.txt, and looks for links to tools and paperwork.
 tool: web-sweep
 match:
   source: web-sweep

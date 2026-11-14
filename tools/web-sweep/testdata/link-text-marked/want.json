@@ -1,11 +1,10 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://www.agency-example.gov/library/worksheet-b",
-        "sha256": "fddaa6056a7860fef303a36a639022d4fe4790d4ac39964c16ad09cc59cebd62",
-        "kind": "link",
+        "address": "https://www.agency-example.gov/library/worksheet-b",
         "title": "Guide to CUI marking worksheet",
+        "kind": "link",
         "via": "https://www.agency-example.gov/library"
       }
     ],

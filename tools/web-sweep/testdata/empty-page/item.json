@@ -1,8 +1,6 @@
 {
-  "item_id": "sweep-empty-page",
   "source": "web-sweep",
   "format": "web-sweep.page.v1",
   "url": "https://www.agency-example.gov/blank",
-  "content_type": "text/html",
-  "observed_at": "2031-03-04T05:06:07Z"
+  "content_type": "text/html"
 }

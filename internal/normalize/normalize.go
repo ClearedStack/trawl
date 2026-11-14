@@ -66,8 +66,9 @@ var Rules = []Info{
 	{RootPath, false, "Writes an empty path as /."},
 }
 
-// MaxLength is the longest address accepted, in bytes.
-const MaxLength = 2048
+// MaxLength is the longest address accepted, in bytes, matching Muster
+// and Logbook.
+const MaxLength = 2000
 
 // Result is a canonical address and the rules that changed the input to
 // reach it, in the order of Rules.
@@ -222,7 +223,11 @@ func Normalize(raw string) (Result, error) {
 		b.WriteByte('?')
 		b.WriteString(query)
 	}
-	return Result{URL: b.String(), Applied: done.list()}, nil
+	out := b.String()
+	if len(out) > MaxLength {
+		return fail(errs.Parse, "too_long")
+	}
+	return Result{URL: out, Applied: done.list()}, nil
 }
 
 func validScheme(s string) bool {

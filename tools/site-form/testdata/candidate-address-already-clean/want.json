@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    ]
+  }
+}

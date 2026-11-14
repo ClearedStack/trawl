@@ -1,11 +1,10 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a00c/c.pdf",
-        "sha256": "b91537df9e9d58c2b77a198615899f49c0d24ed3d77d420550465c9cf1f2193c",
-        "kind": "attachment",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a00c/c.pdf",
         "title": "Made-up notice: private attachment",
+        "kind": "attachment",
         "via": "sam-gov:0000000000000000000000000000a00c"
       }
     ],

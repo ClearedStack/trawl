@@ -4,30 +4,22 @@
 package tool
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
-
-	"go.yaml.in/yaml/v3"
 
 	"github.com/ClearedStack/trawl/internal/errs"
 )
 
-// Input is one item as a sub-tool sees it. The logic of a sub-tool is a
-// pure function of this value.
+// Input is one document as a sub-tool sees it. The logic of a sub-tool is
+// a pure function of this value. Sub-tools never read the clock.
 type Input struct {
-	ItemID string
 	Source string
 	Format string
 	// URL is the canonical address Body was read from. It is empty when
-	// the body arrived inline with the item.
+	// the body arrived inline with a leased item.
 	URL         string
 	ContentType string
 	Body        []byte
-	// ObservedAt is the time the hub attached to the item, in RFC 3339
-	// form. Sub-tools never read the clock.
-	ObservedAt string
 }
 
 // Candidate is an address a sub-tool found, exactly as it found it.
@@ -39,25 +31,12 @@ type Candidate struct {
 	Via string
 }
 
-// Proposal is a validated edit to one field of an existing record. It is
-// passed on for owner approval and changes nothing by itself.
-type Proposal struct {
-	Target string `json:"target"`
-	Field  string `json:"field"`
-	Value  string `json:"value"`
-}
-
-// Output is what a sub-tool extracted from one item.
+// Output is what a sub-tool extracted from one document.
 type Output struct {
 	Candidates []Candidate
-	Proposals  []Proposal
-	// Rejects are entries inside the item that were broken. The rest of
-	// the item still counts.
+	// Rejects are entries inside the document that were broken. The rest
+	// of the document still counts.
 	Rejects []*errs.Error
-	// RateKey, when set, names a counter the item must be counted against
-	// before it is accepted, and RateLimit is the most the counter allows.
-	RateKey   string
-	RateLimit int
 }
 
 // Tool is the logic half of a sub-tool.
@@ -75,29 +54,45 @@ const (
 
 // Rule is the matching half of a sub-tool, read from its match.yaml.
 type Rule struct {
-	Tool  string `yaml:"tool"`
+	Tool  string
 	Match struct {
-		Source  string   `yaml:"source"`
-		Formats []string `yaml:"formats"`
-	} `yaml:"match"`
-	// Input says whether items carry their document inline, name an
-	// address to read it from, or may do either.
-	Input string `yaml:"input"`
+		Source  string
+		Formats []string
+	}
+	// Input says whether the sub-tool's documents arrive inline with a
+	// leased item, are read from an address, or may do either.
+	Input string
 }
 
 // ParseRule reads a match.yaml. Unknown keys are an error.
 func ParseRule(data []byte) (Rule, error) {
-	var r Rule
-	if err := strictYAML(data, &r); err != nil {
+	doc, err := parseYAML(data)
+	if err != nil {
 		return Rule{}, err
 	}
-	if r.Tool == "" || r.Match.Source == "" || len(r.Match.Formats) == 0 {
-		return Rule{}, errors.New("match rule needs tool, match.source and match.formats")
+	var r Rule
+	top := newFields(doc)
+	if r.Tool, err = top.text("tool"); err != nil {
+		return Rule{}, err
 	}
-	for _, f := range r.Match.Formats {
-		if f == "" {
-			return Rule{}, errors.New("match rule has an empty format")
-		}
+	if r.Input, err = top.text("input"); err != nil {
+		return Rule{}, err
+	}
+	match, err := top.mapping("match")
+	if err != nil {
+		return Rule{}, err
+	}
+	if r.Match.Source, err = match.text("source"); err != nil {
+		return Rule{}, err
+	}
+	if r.Match.Formats, err = match.list("formats"); err != nil {
+		return Rule{}, err
+	}
+	if err := match.done(); err != nil {
+		return Rule{}, err
+	}
+	if err := top.done(); err != nil {
+		return Rule{}, err
 	}
 	switch r.Input {
 	case Inline, Fetch, Either:
@@ -107,7 +102,7 @@ func ParseRule(data []byte) (Rule, error) {
 	return r, nil
 }
 
-// Matches reports whether the rule covers an item with this source and
+// Matches reports whether the rule covers a document with this source and
 // format. Both must be equal, byte for byte.
 func (r Rule) Matches(source, format string) bool {
 	if source != r.Match.Source {
@@ -123,33 +118,28 @@ func (r Rule) Matches(source, format string) bool {
 
 // Registry is tools/registry.yaml: the list of sub-tools, by folder name.
 type Registry struct {
-	Contract string   `yaml:"contract"`
-	Tools    []string `yaml:"tools"`
+	Contract string
+	Tools    []string
 }
 
 // ParseRegistry reads a registry.yaml. Unknown keys are an error.
 func ParseRegistry(data []byte) (Registry, error) {
-	var r Registry
-	if err := strictYAML(data, &r); err != nil {
+	doc, err := parseYAML(data)
+	if err != nil {
 		return Registry{}, err
 	}
-	if r.Contract == "" || len(r.Tools) == 0 {
-		return Registry{}, errors.New("registry needs contract and tools")
+	var r Registry
+	top := newFields(doc)
+	if r.Contract, err = top.text("contract"); err != nil {
+		return Registry{}, err
+	}
+	if r.Tools, err = top.list("tools"); err != nil {
+		return Registry{}, err
+	}
+	if err := top.done(); err != nil {
+		return Registry{}, err
 	}
 	return r, nil
-}
-
-func strictYAML(data []byte, v any) error {
-	dec := yaml.NewDecoder(bytes.NewReader(data))
-	dec.KnownFields(true)
-	if err := dec.Decode(v); err != nil {
-		return err
-	}
-	var extra any
-	if err := dec.Decode(&extra); !errors.Is(err, io.EOF) {
-		return errors.New("more than one YAML document")
-	}
-	return nil
 }
 
 // Entry is a registered sub-tool: its rule and its logic.
@@ -191,9 +181,31 @@ func (s *Set) Names() []string {
 // Entries returns the registered sub-tools in registry order.
 func (s *Set) Entries() []Entry { return s.entries }
 
-// Match finds the one sub-tool whose rule covers the item. When none does,
+// Source finds the one sub-tool whose rule names the source, whatever the
+// format. It is used for a leased item, which carries its source and no
+// format. When no rule names the source, or more than one does, it
+// returns E_NEEDS_SUBTOOL.
+func (s *Set) Source(source string) (Entry, error) {
+	var found []Entry
+	for _, e := range s.entries {
+		if e.Rule.Match.Source == source {
+			found = append(found, e)
+		}
+	}
+	material := []byte(source)
+	switch len(found) {
+	case 1:
+		return found[0], nil
+	case 0:
+		return Entry{}, errs.New(errs.NeedsSubtool, "no_matching_rule", material)
+	default:
+		return Entry{}, errs.New(errs.NeedsSubtool, "ambiguous_rule", material)
+	}
+}
+
+// Match finds the one sub-tool whose rule covers the document. When none does,
 // or more than one does, it returns E_NEEDS_SUBTOOL: Trawl never picks. The
-// fingerprint depends only on the source and format, so every item of the
+// fingerprint depends only on the source and format, so every document of the
 // same unknown kind reports the same fingerprint.
 func (s *Set) Match(source, format string) (Entry, error) {
 	var found []Entry

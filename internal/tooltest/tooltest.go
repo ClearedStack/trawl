@@ -4,8 +4,9 @@
 // A sub-tool's testdata folder holds:
 //
 //	match.json          envelopes with the matching result expected
-//	<case>/item.json    the envelope of one item
-//	<case>/body.*       the item's document, byte for byte
+//	<case>/item.json    the envelope: source, format, and for a fetched
+//	                    document its address and content type
+//	<case>/body.*       the document, byte for byte
 //	<case>/want.json    the exact outcome expected
 package tooltest
 
@@ -29,15 +30,14 @@ type matchCase struct {
 }
 
 type itemFile struct {
-	ItemID      string `json:"item_id"`
 	Source      string `json:"source"`
 	Format      string `json:"format"`
 	URL         string `json:"url,omitempty"`
 	ContentType string `json:"content_type,omitempty"`
-	ObservedAt  string `json:"observed_at"`
 }
 
-// want is the saved outcome: a result, or the public error for the item.
+// want is the saved outcome: a result, or the public error for the
+// whole document.
 type want struct {
 	Result *intake.Result `json:"result,omitempty"`
 	Error  string         `json:"error,omitempty"`
@@ -132,13 +132,11 @@ func load(t *testing.T, caseDir string) tool.Input {
 		t.Fatal(err)
 	}
 	return tool.Input{
-		ItemID:      it.ItemID,
 		Source:      it.Source,
 		Format:      it.Format,
 		URL:         it.URL,
 		ContentType: it.ContentType,
 		Body:        body,
-		ObservedAt:  it.ObservedAt,
 	}
 }
 

@@ -1,90 +1,173 @@
-{
-  "records": [
-    {
-      "id": "PA-0001",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "url": "https://calc.depot-example.mil/rates",
-      "kind": "tool",
-      "via": "urgent-1"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
-      "url": "https://tools.agency-example.gov/wage",
-      "kind": "tool",
-      "via": "normal-1"
-    },
-    {
-      "id": "PA-0003",
-      "sha256": "368debbe0a1c4551c42735b8f3c0f8330dfb422cd3df6c437d668a85b1602023",
-      "url": "https://forms.agency-example.gov/library",
-      "kind": "tool",
-      "via": "backfill-1"
+[
+  {
+    "id": "PA-0001",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Made-up tool",
+    "address": "https://example.org/tool",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://example.org/tool",
+        "title": "Made-up tool",
+        "kind": "submission",
+        "via": "form"
+      }
     }
-  ],
-  "sightings": [
-    {
-      "id": "PA-0001",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "item_id": "normal-1",
-      "via": "normal-1"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
-      "item_id": "backfill-1",
-      "via": "backfill-1"
+  },
+  {
+    "id": "PA-0002",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Wage calculator, typed with a fragment",
+    "address": "https://tools.agency-example.gov/wage#top",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator, typed with a fragment",
+        "kind": "submission",
+        "via": "form"
+      }
     }
-  ],
-  "proposals": [],
-  "sextant": [
-    "PA-0001",
-    "PA-0002",
-    "PA-0003"
-  ],
-  "items": [
-    {
-      "item_id": "backfill-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "list"
-    },
-    {
-      "item_id": "normal-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "list",
-      "rejects": [
-        {
-          "code": "E_PARSE",
-          "tool": "list",
-          "reason": "scheme_not_public",
-          "fingerprint": "70df4527d612"
-        }
-      ]
-    },
-    {
-      "item_id": "normal-2",
-      "state": "failed",
-      "attempts": 1,
-      "tool": "list",
-      "code": "E_PARSE",
-      "reason": "bad_json",
-      "fingerprint": "cf71fe825627"
-    },
-    {
-      "item_id": "urgent-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "list"
-    },
-    {
-      "item_id": "normal-3",
-      "state": "needs_subtool",
-      "attempts": 1,
-      "code": "E_NEEDS_SUBTOOL",
-      "reason": "no_matching_rule",
-      "fingerprint": "8968d1d00d93"
+  },
+  {
+    "id": "PA-0003",
+    "state": "rejected",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Made-up private page",
+    "address": "http://192.0.2.10/x",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "reason": "host_not_public",
+        "code": "E_PARSE",
+        "fingerprint": "5e3c289aab0f"
+      }
     }
-  ]
-}
+  },
+  {
+    "id": "PA-0004",
+    "state": "rejected",
+    "lane": "normal",
+    "source": "github-issues",
+    "title": "Made-up checklist",
+    "address": "https://Example.org/checklist/",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "reason": "superseded",
+        "address": "https://example.org/checklist",
+        "item": "PA-0010"
+      }
+    }
+  },
+  {
+    "id": "PA-0005",
+    "state": "rejected",
+    "lane": "normal",
+    "source": "github-issues",
+    "title": "Forms library again",
+    "address": "https://forms.agency-example.gov/library/index.html",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "reason": "duplicate",
+        "address": "https://forms.agency-example.gov/library",
+        "item": "PA-0007"
+      }
+    }
+  },
+  {
+    "id": "PA-0006",
+    "state": "discovered",
+    "lane": "normal",
+    "source": "made-up-source",
+    "title": "T",
+    "address": "https://example.org/stranger",
+    "next": "trawl",
+    "held": true,
+    "attempts": 1
+  },
+  {
+    "id": "PA-0007",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "https://forms.agency-example.gov/library",
+    "address": "https://forms.agency-example.gov/library",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://forms.agency-example.gov/library",
+        "title": "https://forms.agency-example.gov/library",
+        "kind": "tool",
+        "via": "https://feed.agency-example.gov/a"
+      }
+    }
+  },
+  {
+    "id": "PA-0008",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "https://tools.agency-example.gov/wage",
+    "address": "https://tools.agency-example.gov/wage",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "https://tools.agency-example.gov/wage",
+        "kind": "tool",
+        "via": "https://feed.agency-example.gov/a"
+      }
+    }
+  },
+  {
+    "id": "PA-0009",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "https://calc.depot-example.mil/rates",
+    "address": "https://calc.depot-example.mil/rates",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "https://calc.depot-example.mil/rates",
+        "kind": "tool",
+        "via": "https://feed.agency-example.gov/b"
+      }
+    }
+  },
+  {
+    "id": "PA-0010",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "github-issues",
+    "title": "Made-up checklist",
+    "address": "https://example.org/checklist",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "github-issues",
+        "address": "https://example.org/checklist",
+        "title": "Made-up checklist"
+      }
+    }
+  }
+]

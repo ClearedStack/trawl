@@ -61,7 +61,7 @@ func runNormalize(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 			fmt.Fprintf(stdout, "id      %s\n", id)
 			continue
 		}
-		records, _ := dedupe.Decide([]dedupe.Entry{{URL: res.URL, SHA256: hash}}, seen.Known(), seen.LastSeq())
+		records := dedupe.Decide([]string{res.URL}, seen.Known(), seen.LastSeq())
 		if err := seen.Put(records[0]); err != nil {
 			fmt.Fprintln(stderr, "the store file could not be written")
 			return 2

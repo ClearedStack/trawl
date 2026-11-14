@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 	"github.com/ClearedStack/trawl/internal/golden"
 	"github.com/ClearedStack/trawl/internal/muster"
 	"github.com/ClearedStack/trawl/internal/spool"
+	"github.com/ClearedStack/trawl/internal/tool"
 	"github.com/ClearedStack/trawl/internal/worker"
 )
 
@@ -103,6 +105,22 @@ func TestRulesDoNotOverlap(t *testing.T) {
 	}
 }
 
+// TestInputModes pins how each sub-tool's documents arrive: the three
+// public sources are read from an address on Trawl's own schedule, and a
+// form submission arrives inline with a leased item.
+func TestInputModes(t *testing.T) {
+	set, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]string{"sam-gov": tool.Fetch, "github-issues": tool.Fetch, "web-sweep": tool.Fetch, "site-form": tool.Inline}
+	for _, e := range set.Entries() {
+		if e.Rule.Input != want[e.Rule.Tool] {
+			t.Errorf("%s input is %s, want %s", e.Rule.Tool, e.Rule.Input, want[e.Rule.Tool])
+		}
+	}
+}
+
 // madeUpWeb serves fixture pages by host name without a network.
 type madeUpWeb map[string]http.Handler
 
@@ -125,40 +143,39 @@ func body(t *testing.T, path string) []byte {
 	return data
 }
 
-const observed = "2031-03-04T05:06:07Z"
+const (
+	trawlToken = "made-up-token-for-trawl"
+	connToken  = "made-up-token-for-conn"
+)
 
-// pipeline queues a fixed batch that touches every sub-tool and every
-// failure mode, using the sub-tools' own fixture documents.
-func pipeline(t *testing.T, hub *muster.Memory) *fetch.Fetcher {
-	inline := func(lane muster.Lane, id, source, format, path string) {
-		hub.Enqueue(lane, muster.Item{ItemID: id, Source: source, Format: format, Payload: body(t, path), ObservedAt: observed})
+func hubClient(t *testing.T, base, token string) *muster.HTTP {
+	t.Helper()
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	if err := os.WriteFile(tokenFile, []byte(token), 0o600); err != nil {
+		t.Fatal(err)
 	}
-	fetched := func(lane muster.Lane, id, source, format, address string) {
-		hub.Enqueue(lane, muster.Item{ItemID: id, Source: source, Format: format, Fetch: address, ObservedAt: observed})
+	c, err := muster.NewHTTP(base, tokenFile, 5*time.Second)
+	if err != nil {
+		t.Fatal(err)
 	}
+	return c
+}
 
-	inline(muster.Normal, "notices-1", "sam-gov", "sam-gov.opportunities.v2", "sam-gov/testdata/page-of-notices/body.json")
-	inline(muster.Normal, "issues-1", "github-issues", "github-issues.v1", "github-issues/testdata/list-mixed/body.json")
-	fetched(muster.Backfill, "sweep-1", "web-sweep", "web-sweep.page.v1", "https://www.agency-example.gov/small-business/resources")
-	fetched(muster.Backfill, "sweep-2", "web-sweep", "web-sweep.page.v1", "https://www.agency-example.gov/private/drafts")
-	fetched(muster.Backfill, "sweep-3", "web-sweep", "web-sweep.page.v1", "https://www.agency-example.gov/downloads/readiness.pdf")
-	fetched(muster.Backfill, "sweep-4", "web-sweep", "web-sweep.page.v1", "https://slow.agency-example.gov/tools")
-	fetched(muster.Backfill, "notices-2", "sam-gov", "sam-gov.opportunities.v2", "https://feed.agency-example.gov/opportunities/v2/search?limit=10")
+// sources is the sources file for the pipeline run: one address for each
+// of the three public sources, some that fail, and one no sub-tool knows.
+var sources = []worker.Source{
+	{Source: "sam-gov", Format: "sam-gov.opportunities.v2", Fetch: "https://feed.agency-example.gov/opportunities/v2/search?limit=10"},
+	{Source: "github-issues", Format: "github-issues.v1", Fetch: "https://code.agency-example.gov/api/issues?labels=suggestion"},
+	{Source: "web-sweep", Format: "web-sweep.page.v1", Fetch: "https://www.agency-example.gov/small-business/resources"},
+	{Source: "web-sweep", Format: "web-sweep.page.v1", Fetch: "https://www.agency-example.gov/private/drafts"},
+	{Source: "web-sweep", Format: "web-sweep.page.v1", Fetch: "https://www.agency-example.gov/downloads/readiness.pdf"},
+	{Source: "web-sweep", Format: "web-sweep.page.v1", Fetch: "https://slow.agency-example.gov/tools"},
+	{Source: "made-up-feed", Format: "made-up.v1", Fetch: "https://feed.agency-example.gov/made-up"},
+	{Source: "site-form", Format: "site-form.v1", Fetch: "https://www.agency-example.gov/form.json"},
+}
 
-	// Six submissions from one sender on one day: the sixth is over the
-	// limit. They are urgent, so they are handled first, in this order.
-	for i, name := range []string{"candidate", "candidate-markup-stripped", "candidate-no-title", "exactly-4096-bytes", "candidate-address-not-public", "candidate"} {
-		inline(muster.Urgent, fmt.Sprintf("form-%d", i+1), "site-form", "site-form.v1", "site-form/testdata/"+name+"/body.json")
-	}
-	inline(muster.Urgent, "form-edit", "site-form", "site-form.v1", "site-form/testdata/edit-summary/body.json")
-	inline(muster.Urgent, "form-spam", "site-form", "site-form.v1", "site-form/testdata/honeypot-filled/body.json")
-
-	// An item from a source no sub-tool knows, a sweep item that wrongly
-	// carries its page inline, and a form item that asks for a fetch.
-	inline(muster.Normal, "unknown-1", "made-up-feed", "made-up.v1", "sam-gov/testdata/empty-page/body.json")
-	inline(muster.Normal, "sweep-inline", "web-sweep", "web-sweep.page.v1", "sam-gov/testdata/empty-page/body.json")
-	fetched(muster.Normal, "form-fetch", "site-form", "site-form.v1", "https://www.agency-example.gov/form.json")
-
+// madeUpSites serves the sub-tools' own fixture documents.
+func madeUpSites(t *testing.T) *fetch.Fetcher {
 	page := func(contentType, path string) http.HandlerFunc {
 		data := body(t, path)
 		return func(w http.ResponseWriter, _ *http.Request) {
@@ -175,47 +192,88 @@ func pipeline(t *testing.T, hub *muster.Memory) *fetch.Fetcher {
 	www.HandleFunc("/downloads/readiness.pdf", page("application/pdf", "web-sweep/testdata/not-html/body.pdf"))
 	feed := http.NewServeMux()
 	feed.HandleFunc("/opportunities/v2/search", page("application/json", "sam-gov/testdata/page-of-notices/body.json"))
-	slowCalls := 0
-	slow := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Fails once, then answers: an upstream that recovers.
-		slowCalls++
-		if slowCalls == 1 {
-			w.WriteHeader(http.StatusGatewayTimeout)
-			return
-		}
-		if r.URL.Path == "/robots.txt" {
-			http.NotFound(w, r)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprint(w, `<a href="/tools/late-checklist">Late checklist</a>`)
+	code := http.NewServeMux()
+	code.HandleFunc("/api/issues", page("application/json", "github-issues/testdata/list-mixed/body.json"))
+	slow := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusGatewayTimeout)
 	})
 	return fetch.NewWithTransport(madeUpWeb{
 		"www.agency-example.gov":  www,
 		"feed.agency-example.gov": feed,
+		"code.agency-example.gov": code,
 		"slow.agency-example.gov": slow,
 	}, time.Second)
 }
 
 func runPipeline(t *testing.T) []byte {
-	hub := muster.NewMemory()
-	fetcher := pipeline(t, hub)
+	hub := muster.NewFake(map[string]string{trawlToken: "trawl", connToken: "conn"})
+	srv := httptest.NewServer(hub)
+	defer srv.Close()
+
+	// Conn files candidates from the site's form, using the site-form
+	// fixtures, each with a visitor's proof of work.
+	hub.SetPowBits(4)
+	for _, name := range []string{
+		"candidate-address-already-clean",
+		"candidate",
+		"candidate-markup-stripped",
+		"candidate-address-not-public",
+	} {
+		var submission struct {
+			Title   string `json:"title"`
+			Address string `json:"address"`
+		}
+		if err := json.Unmarshal(body(t, "site-form/testdata/"+name+"/body.json"), &submission); err != nil {
+			t.Fatal(err)
+		}
+		filing, _ := json.Marshal(map[string]string{
+			"contract": "v1", "source": muster.SourceSiteForm, "title": submission.Title, "address": submission.Address,
+			"pow": hub.SolvePow(muster.SourceSiteForm, submission.Title, submission.Address), "visitor": "203.0.113.7",
+		})
+		req, _ := http.NewRequest(http.MethodPost, srv.URL+"/v1/items", bytes.NewReader(filing))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+connToken)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusCreated {
+			t.Fatalf("conn filing %s: status %d", name, resp.StatusCode)
+		}
+	}
+
 	set, err := Load()
 	if err != nil {
 		t.Fatal(err)
 	}
-	sp, err := spool.Open(t.TempDir())
+	dir := t.TempDir()
+	sp, err := spool.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	w := &worker.Worker{Hub: hub, Spool: sp, Tools: set, Fetcher: fetcher, Poll: time.Millisecond, Backoff: time.Millisecond, HeartbeatEvery: time.Hour}
+	w := &worker.Worker{
+		Hub:            hubClient(t, srv.URL, trawlToken),
+		Spool:          sp,
+		Tools:          set,
+		Fetcher:        madeUpSites(t),
+		Sources:        sources,
+		Poll:           time.Millisecond,
+		Backoff:        time.Millisecond,
+		HeartbeatEvery: time.Hour,
+	}
 	if err := w.Run(context.Background(), true); err != nil {
 		t.Fatal(err)
 	}
-	if left, _ := sp.Pending(); len(left) != 0 {
+	if left, _ := os.ReadDir(dir); len(left) != 0 {
 		t.Errorf("%d entries left in the spool", len(left))
 	}
-	data, err := golden.Marshal(hub.Snapshot())
+	for _, call := range hub.Calls() {
+		if call.Status >= 400 {
+			t.Errorf("the hub refused %s with %d: %s", call.Path, call.Status, call.Body)
+		}
+	}
+	data, err := golden.Marshal(hub.Items())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -223,7 +281,7 @@ func runPipeline(t *testing.T) []byte {
 }
 
 // TestPipelineGolden runs every sub-tool through the whole worker against
-// the stand-in hub and compares all the hub ends up holding with a saved
+// the fake hub and compares all the hub ends up holding with a saved
 // file. Two runs must agree byte for byte.
 func TestPipelineGolden(t *testing.T) {
 	first, second := runPipeline(t), runPipeline(t)

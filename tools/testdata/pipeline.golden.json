@@ -1,360 +1,284 @@
-{
-  "records": [
-    {
-      "id": "PA-0001",
-      "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
-      "url": "https://tools.agency-example.gov/wage",
-      "kind": "submission",
-      "title": "Wage calculator",
-      "via": "site-form"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "url": "https://calc.depot-example.mil/rates",
-      "kind": "submission",
-      "title": "Rate table helper",
-      "via": "site-form"
-    },
-    {
-      "id": "PA-0003",
-      "sha256": "368debbe0a1c4551c42735b8f3c0f8330dfb422cd3df6c437d668a85b1602023",
-      "url": "https://forms.agency-example.gov/library",
-      "kind": "submission",
-      "via": "site-form"
-    },
-    {
-      "id": "PA-0004",
-      "sha256": "12223427bd1941faadbbc48992a2323ff6732fcc4f9fbcc6392087a30968b70a",
-      "url": "https://tools.agency-example.gov/wage-calculator",
-      "kind": "calculator",
-      "title": "Made-up notice: wage survey support",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0005",
-      "sha256": "ef9d411db4f2413cd15485c0c452d61282fe21f188a422fc6bb442e8aceaec5b",
-      "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
-      "kind": "attachment",
-      "title": "Made-up notice: wage survey support",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0006",
-      "sha256": "f9e9fb47a5de0236cc10e986fb29d6b47f455db2fedb5cba37f71248d7a2da24",
-      "url": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
-      "kind": "attachment",
-      "title": "Made-up notice: wage survey support",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0007",
-      "sha256": "84d392e8439217bbf374e7b86a9b038d95fd4326b4fa554228aa6bde1c3a1637",
-      "url": "https://calc.depot-example.mil/Rate-Calculator",
-      "kind": "calculator",
-      "title": "Made-up notice: depot rate study",
-      "via": "sam-gov:0000000000000000000000000000a002"
-    },
-    {
-      "id": "PA-0008",
-      "sha256": "9d20d69d62a4443fae176d7137f3c2ecb6948aa3e5d4802c161d1837aafb8cf5",
-      "url": "https://www.agency-example.gov/tools/wage-floor",
-      "kind": "link",
-      "title": "Wage floor calculator",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0009",
-      "sha256": "9f1809f07e7693b6b43e434653f196dd0c29d29a1733b504b66f1b4209dbcd76",
-      "url": "https://www.agency-example.gov/small-business/estimators",
-      "kind": "link",
-      "title": "Cost estimators",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0010",
-      "sha256": "7908076efd5c0f1267fd1d9a540003a544715a9104d7b6356043376e2cd977a2",
-      "url": "https://www.agency-example.gov/forms",
-      "kind": "link",
-      "title": "Forms library",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0011",
-      "sha256": "589eb9bce0913416f9690d31904a27bd365eb88d9a551f5800b6b798b33c4e42",
-      "url": "https://vendor.example.com/products/proposal-builder",
-      "kind": "link",
-      "title": "A made-up vendor product",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0012",
-      "sha256": "3c75147acf4105dc885119113e313b556f326ae2d14c594da6a8e7f25a5f6f28",
-      "url": "https://www.agency-example.gov/downloads/readiness.pdf",
-      "kind": "link",
-      "title": "Readiness checklist (PDF)",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0013",
-      "sha256": "1eb6042a98b3a1122f7bbc7eba731b2666bdececfb519d333bd0dc72cb02e885",
-      "url": "https://www.agency-example.gov/search?q=a&sort=new",
-      "kind": "link",
-      "title": "Search finder",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0014",
-      "sha256": "fd24f2c5adecd4a2b6c27bafb1b076f522be7ccbd5d16dfe9e8a9eb2a79dd98b",
-      "url": "https://slow.agency-example.gov/tools/late-checklist",
-      "kind": "link",
-      "title": "Late checklist",
-      "via": "https://slow.agency-example.gov/tools"
+[
+  {
+    "id": "PA-0001",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Wage calculator",
+    "address": "https://tools.agency-example.gov/wage",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator",
+        "kind": "submission",
+        "via": "site-form"
+      }
     }
-  ],
-  "sightings": [
-    {
-      "id": "PA-0001",
-      "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
-      "item_id": "form-4",
-      "via": "site-form"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "item_id": "notices-1",
-      "via": "sam-gov:0000000000000000000000000000a002"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "item_id": "issues-1",
-      "via": "github-issues#21"
-    },
-    {
-      "id": "PA-0003",
-      "sha256": "368debbe0a1c4551c42735b8f3c0f8330dfb422cd3df6c437d668a85b1602023",
-      "item_id": "issues-1",
-      "via": "github-issues#26"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "item_id": "sweep-1",
-      "via": "https://www.agency-example.gov/small-business/resources"
-    },
-    {
-      "id": "PA-0004",
-      "sha256": "12223427bd1941faadbbc48992a2323ff6732fcc4f9fbcc6392087a30968b70a",
-      "item_id": "notices-2",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0005",
-      "sha256": "ef9d411db4f2413cd15485c0c452d61282fe21f188a422fc6bb442e8aceaec5b",
-      "item_id": "notices-2",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0006",
-      "sha256": "f9e9fb47a5de0236cc10e986fb29d6b47f455db2fedb5cba37f71248d7a2da24",
-      "item_id": "notices-2",
-      "via": "sam-gov:0000000000000000000000000000a001"
-    },
-    {
-      "id": "PA-0002",
-      "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40",
-      "item_id": "notices-2",
-      "via": "sam-gov:0000000000000000000000000000a002"
-    },
-    {
-      "id": "PA-0007",
-      "sha256": "84d392e8439217bbf374e7b86a9b038d95fd4326b4fa554228aa6bde1c3a1637",
-      "item_id": "notices-2",
-      "via": "sam-gov:0000000000000000000000000000a002"
+  },
+  {
+    "id": "PA-0002",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Wage calculator",
+    "address": "https://Tools.Agency-Example.gov/wage/?utm_source=newsletter",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator",
+        "kind": "submission",
+        "via": "site-form"
+      }
     }
-  ],
-  "proposals": [
-    {
-      "target": "PA-0007",
-      "field": "summary",
-      "value": "Works out a made-up wage floor. Now covers two more regions."
+  },
+  {
+    "id": "PA-0003",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Rate table helper",
+    "address": "https://calc.depot-example.mil/rates",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Rate table helper",
+        "kind": "submission",
+        "via": "site-form"
+      }
     }
-  ],
-  "sextant": [
-    "PA-0001",
-    "PA-0002",
-    "PA-0003",
-    "PA-0004",
-    "PA-0005",
-    "PA-0006",
-    "PA-0007",
-    "PA-0008",
-    "PA-0009",
-    "PA-0010",
-    "PA-0011",
-    "PA-0012",
-    "PA-0013",
-    "PA-0014"
-  ],
-  "items": [
-    {
-      "item_id": "notices-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "sam-gov"
-    },
-    {
-      "item_id": "issues-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "github-issues",
-      "rejects": [
-        {
-          "code": "E_PARSE",
-          "tool": "github-issues",
-          "reason": "no_address",
-          "fingerprint": "bcad3c0244fa"
-        },
-        {
-          "code": "E_PARSE",
-          "tool": "github-issues",
-          "reason": "bad_issue",
-          "fingerprint": "a97dd3634d80"
-        },
-        {
-          "code": "E_PARSE",
-          "tool": "github-issues",
-          "reason": "bad_issue",
-          "fingerprint": "d7c0c1e45d1a"
-        },
-        {
-          "code": "E_PARSE",
-          "tool": "github-issues",
-          "reason": "no_body",
-          "fingerprint": "83dac70fc011"
-        }
-      ]
-    },
-    {
-      "item_id": "sweep-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "web-sweep"
-    },
-    {
-      "item_id": "sweep-2",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "web-sweep",
-      "disposition": "robots_disallowed"
-    },
-    {
-      "item_id": "sweep-3",
-      "state": "needs_subtool",
-      "attempts": 1,
-      "tool": "web-sweep",
-      "code": "E_NEEDS_SUBTOOL",
-      "reason": "not_html",
-      "fingerprint": "e57e4e2712df"
-    },
-    {
-      "item_id": "sweep-4",
-      "state": "completed",
-      "attempts": 2,
-      "tool": "web-sweep"
-    },
-    {
-      "item_id": "notices-2",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "sam-gov"
-    },
-    {
-      "item_id": "form-1",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form"
-    },
-    {
-      "item_id": "form-2",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form"
-    },
-    {
-      "item_id": "form-3",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form"
-    },
-    {
-      "item_id": "form-4",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form"
-    },
-    {
-      "item_id": "form-5",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form",
-      "rejects": [
-        {
-          "code": "E_PARSE",
-          "tool": "site-form",
-          "reason": "host_not_public",
-          "fingerprint": "0ea70552d0f7"
-        }
-      ]
-    },
-    {
-      "item_id": "form-6",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form",
-      "disposition": "rate_limited"
-    },
-    {
-      "item_id": "form-edit",
-      "state": "completed",
-      "attempts": 1,
-      "tool": "site-form"
-    },
-    {
-      "item_id": "form-spam",
-      "state": "failed",
-      "attempts": 1,
-      "tool": "site-form",
-      "code": "E_PARSE",
-      "reason": "honeypot",
-      "fingerprint": "f9751ff461cb"
-    },
-    {
-      "item_id": "unknown-1",
-      "state": "needs_subtool",
-      "attempts": 1,
-      "code": "E_NEEDS_SUBTOOL",
-      "reason": "no_matching_rule",
-      "fingerprint": "19e663e0dd0a"
-    },
-    {
-      "item_id": "sweep-inline",
-      "state": "needs_subtool",
-      "attempts": 1,
-      "tool": "web-sweep",
-      "code": "E_NEEDS_SUBTOOL",
-      "reason": "input_mode",
-      "fingerprint": "749edf0e082a"
-    },
-    {
-      "item_id": "form-fetch",
-      "state": "needs_subtool",
-      "attempts": 1,
-      "tool": "site-form",
-      "code": "E_NEEDS_SUBTOOL",
-      "reason": "input_mode",
-      "fingerprint": "dc575dbbe5c9"
+  },
+  {
+    "id": "PA-0004",
+    "state": "rejected",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Made-up admin page",
+    "address": "http://localhost:8080/admin",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "reason": "host_not_public",
+        "code": "E_PARSE",
+        "fingerprint": "0ea70552d0f7"
+      }
     }
-  ]
-}
+  },
+  {
+    "id": "PA-0005",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://tools.agency-example.gov/wage-calculator",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://tools.agency-example.gov/wage-calculator",
+        "title": "Made-up notice: wage survey support",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0006",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0007",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0008",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: depot rate study",
+    "address": "https://calc.depot-example.mil/Rate-Calculator",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://calc.depot-example.mil/Rate-Calculator",
+        "title": "Made-up notice: depot rate study",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a002"
+      }
+    }
+  },
+  {
+    "id": "PA-0009",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "github-issues",
+    "title": "Forms library",
+    "address": "https://forms.agency-example.gov/library",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "github-issues",
+        "address": "https://forms.agency-example.gov/library",
+        "title": "Forms library",
+        "kind": "paperwork",
+        "via": "github-issues#26"
+      }
+    }
+  },
+  {
+    "id": "PA-0010",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Wage floor calculator",
+    "address": "https://www.agency-example.gov/tools/wage-floor",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/tools/wage-floor",
+        "title": "Wage floor calculator",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0011",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Cost estimators",
+    "address": "https://www.agency-example.gov/small-business/estimators",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/small-business/estimators",
+        "title": "Cost estimators",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0012",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Forms library",
+    "address": "https://www.agency-example.gov/forms",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/forms",
+        "title": "Forms library",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0013",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "A made-up vendor product",
+    "address": "https://vendor.example.com/products/proposal-builder",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://vendor.example.com/products/proposal-builder",
+        "title": "A made-up vendor product",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0014",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Readiness checklist (PDF)",
+    "address": "https://www.agency-example.gov/downloads/readiness.pdf",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/downloads/readiness.pdf",
+        "title": "Readiness checklist (PDF)",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0015",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Search finder",
+    "address": "https://www.agency-example.gov/search?q=a&sort=new",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/search?q=a\u0026sort=new",
+        "title": "Search finder",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  }
+]

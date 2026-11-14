@@ -1,6 +1,4 @@
 {
-  "item_id": "notices-top-level-list",
   "source": "sam-gov",
-  "format": "sam-gov.opportunities.v2",
-  "observed_at": "2031-03-04T05:06:07Z"
+  "format": "sam-gov.opportunities.v2"
 }

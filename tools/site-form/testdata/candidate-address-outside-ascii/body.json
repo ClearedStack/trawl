@@ -1,8 +1,5 @@
 {
-  "kind": "candidate",
-  "url": "https://bücher.example.com/katalog",
+  "source": "site-form",
   "title": "Made-up catalogue",
-  "website": "",
-  "pow": {"challenge": "made-up-challenge-01", "nonce": "286764"},
-  "ip_hash": "b4f897e0ed3ad0d7bc377475adbe08ac20fef655834d59b15ae9228c16a5dcc1"
+  "address": "https://bücher.example.com/katalog"
 }

@@ -2,11 +2,11 @@
 # There is no Dockerfile.
 #
 #   KO_DOCKER_REPO=lazarette.clearedstack.svc.cluster.local:5000 \
-#     ko build --base-import-paths ./cmd/trawl
+#     ko build --platform=linux/arm64 --base-import-paths ./cmd/trawl
 #
-# The base image holds no shell and no package manager, and runs as a
-# user that is not root.
-defaultBaseImage: cgr.dev/chainguard/static:latest
+# The base image holds no shell and no package manager, includes CA
+# certificates for outbound HTTPS, and runs as user 65532 (nonroot).
+defaultBaseImage: cgr.dev/chainguard/static@sha256:17367e4d3ae2b46c3290858e483fac09be085c92b372360fe3bf6a6150848fde
 
 builds:
   - id: trawl
@@ -18,3 +18,4 @@ builds:
     ldflags:
       - -s
       - -w
+      - -buildid=

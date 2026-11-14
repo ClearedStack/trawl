@@ -169,3 +169,21 @@ func FuzzNormalize(f *testing.F) {
 		}
 	})
 }
+
+func TestLengthLimitAt2000Bytes(t *testing.T) {
+	const prefix = "https://tools.agency-example.gov/"
+	atLimit := prefix + strings.Repeat("a", MaxLength-len(prefix))
+	if res, err := Normalize(atLimit); err != nil || len(res.URL) != MaxLength {
+		t.Fatalf("2000-byte address: %+v, %v", res, err)
+	}
+	overLimit := atLimit + "a"
+	if _, err := Normalize(overLimit); err == nil || !strings.Contains(err.Error(), "reason=too_long") {
+		t.Fatalf("2001-byte address: %v", err)
+	}
+	// Quotes expand from 1 byte to 3 (%22); a raw input under 2,000 bytes
+	// whose canonical form exceeds 2,000 bytes must also be refused.
+	expanded := prefix + strings.Repeat(`"`, 700)
+	if _, err := Normalize(expanded); err == nil || !strings.Contains(err.Error(), "reason=too_long") {
+		t.Fatalf("escaped expansion past 2000 bytes: %v", err)
+	}
+}

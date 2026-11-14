@@ -1,11 +1,10 @@
 {
   "result": {
-    "entries": [
+    "candidates": [
       {
-        "url": "https://forms.agency-example.gov/library/form-000.pdf",
-        "sha256": "84ae743b9eddfb03d9544c35b893bbb4f4fa10dfb89effb953176827677d2833",
-        "kind": "paperwork",
+        "address": "https://forms.agency-example.gov/library/form-000.pdf",
         "title": "Made-up form 000",
+        "kind": "paperwork",
         "via": "github-issues#15"
       }
     ]
