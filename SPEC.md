@@ -60,6 +60,7 @@ Each source adapter lives under `tools/<case>/` in the Trawl repository (registe
 - **Zero direct database access:** Trawl holds no Postgres credentials and cannot reach Logbook, Plainforge, or Lazarette under default-deny `NetworkPolicy` rules; all state mutations pass through Muster.
 - **5-layer anonymous submission shield (`site-form` & Portal `✎`):** Enforces ~1s browser SHA-256 Proof-of-Work, honeypot field, daily-salted IP hash rate limiting (never storing raw IPs), strict 4 KB schema validation against `ownership_map.json` with HTML/script stripping, and owner approval in Countersign before any edit touches Plainforge.
 - **Passive, public-only boundary:** Never creates third-party accounts, requests sales demos, bypasses paywalls or CAPTCHAs, ignores `robots.txt`, or accepts Controlled Unclassified Information (CUI) or proprietary bid figures.
+- **Public hosts only:** Address normalization refuses loopback, private, IP-literal and single-label hosts; the one test-only exception is the single local origin named by `TRAWL_LOCAL_TEST_ORIGIN`, which `deploy/` never sets (see the README).
 - **Unprivileged pod:** Runs as non-root with dropped Linux capabilities and a read-only root filesystem (writable only at `/var/spool/cs`).
 
 ## Related pages

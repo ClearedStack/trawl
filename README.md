@@ -77,6 +77,16 @@ The sources file is JSON. Each entry names a source Muster knows, the format of 
 }
 ```
 
+### Test-only setting
+
+`TRAWL_LOCAL_TEST_ORIGIN` lets an end-to-end test record an item served from the test machine. It is for tests only, and `deploy/` never sets it. Its value must be exactly `http://127.0.0.1:<port>` or `http://[::1]:<port>`, with a port from 1 to 65535, no path, no trailing slash and no user name. Any other non-empty value makes `trawl normalize` and `trawl work` refuse to start (exit status 2).
+
+When it is set, an address on exactly that origin (scheme `http`, the same host and the same port) passes the public-host rule and is kept as `http` with its host and port as given. The other rules, including the path rules, apply as usual. Every other loopback, private, IP-literal or bracketed address, such as `http://127.0.0.1:<other port>` or `http://localhost:<port>`, is refused as before. Both commands print one fixed JSON warning line to standard error at start. Trawl still never fetches such an address: the fetcher keeps refusing loopback and private hosts. Unset, output is unchanged.
+
+```sh
+printf 'http://127.0.0.1:41234/calculator\n' | TRAWL_LOCAL_TEST_ORIGIN=http://127.0.0.1:41234 ./trawl normalize
+```
+
 ### Tests
 
 ```sh
