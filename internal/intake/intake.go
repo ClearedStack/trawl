@@ -51,6 +51,11 @@ type Result struct {
 // document with E_NEEDS_SUBTOOL; trying the document again later is safe,
 // because the hub knows an address it has already been given.
 func Process(t tool.Tool, in tool.Input) (Result, error) {
+	return ProcessWith(normalize.Config{}, t, in)
+}
+
+// ProcessWith is Process with the address settings in cfg.
+func ProcessWith(cfg normalize.Config, t tool.Tool, in tool.Input) (Result, error) {
 	name := t.Name()
 	out, err := t.Extract(in)
 	if err != nil {
@@ -61,13 +66,18 @@ func Process(t tool.Tool, in tool.Input) (Result, error) {
 		// in the sub-tool, reported without its text.
 		return Result{}, errs.New(errs.NeedsSubtool, "subtool_fault", []byte(name)).WithTool(name)
 	}
-	return Clean(name, out)
+	return CleanWith(cfg, name, out)
 }
 
 // Clean applies the shared rules to what a sub-tool found: the
 // control-marking screen, text cleaning and address normalization. name
 // is the sub-tool the errors are attributed to.
 func Clean(name string, out tool.Output) (Result, error) {
+	return CleanWith(normalize.Config{}, name, out)
+}
+
+// CleanWith is Clean with the address settings in cfg.
+func CleanWith(cfg normalize.Config, name string, out tool.Output) (Result, error) {
 	if len(out.Candidates) > MaxCandidates {
 		return Result{}, errs.New(errs.NeedsSubtool, "too_many_candidates", []byte(name)).WithTool(name)
 	}
@@ -81,7 +91,7 @@ func Clean(name string, out tool.Output) (Result, error) {
 			res.Rejects = append(res.Rejects, reject(errs.New(errs.Parse, "controlled_marking", []byte(c.URL)).WithTool(name)))
 			continue
 		}
-		norm, err := normalize.Normalize(c.URL)
+		norm, err := cfg.Normalize(c.URL)
 		if err != nil {
 			e, _ := errs.As(err)
 			if e.Code == errs.NeedsSubtool {

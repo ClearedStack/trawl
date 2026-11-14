@@ -44,6 +44,10 @@ func runWork(args []string, _, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "CONTRACT_VERSION must be %s\n", muster.ContractVersion)
 		return 2
 	}
+	cfg, ok := localTestConfig(stderr)
+	if !ok {
+		return 2
+	}
 	defaultEvery := 6 * time.Hour
 	if raw := os.Getenv("TRAWL_SWEEP_EVERY"); raw != "" {
 		d, err := time.ParseDuration(raw)
@@ -114,6 +118,7 @@ func runWork(args []string, _, stderr io.Writer) int {
 		Spool:      sp,
 		Tools:      set,
 		Fetcher:    fetch.New(fetch.DefaultTimeout),
+		Normalize:  cfg,
 		Log:        log,
 		Sources:    sources,
 		SweepEvery: *sweepEvery,

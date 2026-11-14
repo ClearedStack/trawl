@@ -135,7 +135,12 @@ func (a applied) list() []Rule {
 // Normalize returns the canonical form of raw. On failure the error is a
 // public *errs.Error: E_PARSE for a broken or non-public address, and
 // E_NEEDS_SUBTOOL for a well-formed address no rule covers.
-func Normalize(raw string) (Result, error) {
+func Normalize(raw string) (Result, error) { return normalize(raw, "") }
+
+// normalize is Normalize with one optional local test origin, already
+// checked by ParseLocalTestOrigin, whose authority skips the public-host
+// rule. Everything else about the address is cleaned as usual.
+func normalize(raw, local string) (Result, error) {
 	fail := func(code errs.Code, reason string) (Result, error) {
 		return Result{}, errs.New(code, reason, []byte(raw))
 	}
@@ -181,9 +186,18 @@ func Normalize(raw string) (Result, error) {
 		authority, tail = rest[:i], rest[i:]
 	}
 
-	host, port, code, reason := splitAuthority(authority, scheme, done)
-	if reason != "" {
-		return fail(code, reason)
+	var host, port string
+	if local != "" && scheme == "http" && authority == local[len("http://"):] {
+		// The one test-only exception: keep host and port exactly as given.
+		i := strings.LastIndexByte(authority, ':')
+		host, port = authority[:i], authority[i+1:]
+	} else {
+		var code errs.Code
+		var reason string
+		host, port, code, reason = splitAuthority(authority, scheme, done)
+		if reason != "" {
+			return fail(code, reason)
+		}
 	}
 
 	if i := strings.IndexByte(tail, '#'); i >= 0 {

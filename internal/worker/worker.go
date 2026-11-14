@@ -26,6 +26,7 @@ import (
 	"github.com/ClearedStack/trawl/internal/fetch"
 	"github.com/ClearedStack/trawl/internal/intake"
 	"github.com/ClearedStack/trawl/internal/muster"
+	"github.com/ClearedStack/trawl/internal/normalize"
 	"github.com/ClearedStack/trawl/internal/spool"
 	"github.com/ClearedStack/trawl/internal/tool"
 )
@@ -130,6 +131,10 @@ type Worker struct {
 	Tools   *tool.Set
 	Fetcher Fetcher
 	Log     *slog.Logger
+
+	// Normalize holds the address settings every candidate and leased
+	// item passes through. The zero value is the default.
+	Normalize normalize.Config
 
 	// Sources are read on every sweep. SweepEvery is the time between
 	// sweeps; zero means sweep once, when Run starts.
@@ -271,7 +276,7 @@ func (w *Worker) read(ctx context.Context, src Source) (intake.Result, string, e
 		// Never repeat an outside error: it may name an address.
 		return intake.Result{}, name, errs.New(errs.Timeout, "fetch_failed", class).WithTool(name)
 	}
-	res, err := intake.Process(entry.Tool, tool.Input{
+	res, err := intake.ProcessWith(w.Normalize, entry.Tool, tool.Input{
 		Source:      src.Source,
 		Format:      src.Format,
 		URL:         doc.URL,
@@ -414,12 +419,12 @@ func (w *Worker) decide(lease *muster.Lease) Staged {
 			Via  string `json:"via"`
 		}
 		json.Unmarshal(lease.Results[muster.Worker], &prior)
-		res, err = intake.Clean(st.Tool, tool.Output{Candidates: []tool.Candidate{
+		res, err = intake.CleanWith(w.Normalize, st.Tool, tool.Output{Candidates: []tool.Candidate{
 			{URL: found.Address, Title: found.Title, Kind: prior.Kind, Via: prior.Via},
 		}})
 	} else {
 		doc, _ := json.Marshal(found)
-		res, err = intake.Process(entry.Tool, tool.Input{
+		res, err = intake.ProcessWith(w.Normalize, entry.Tool, tool.Input{
 			Source:      found.Source,
 			Format:      entry.Rule.Match.Formats[0],
 			ContentType: "application/json",

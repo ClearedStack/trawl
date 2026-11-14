@@ -22,6 +22,10 @@ func runNormalize(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
+	cfg, ok := localTestConfig(stderr)
+	if !ok {
+		return 2
+	}
 	if fs.NArg() != 0 {
 		fmt.Fprintln(stderr, "normalize takes addresses on standard input, not as arguments")
 		return 2
@@ -47,7 +51,7 @@ func runNormalize(args []string, stdin io.Reader, stdout, stderr io.Writer) int 
 		}
 		first = false
 
-		res, err := normalize.Normalize(line)
+		res, err := cfg.Normalize(line)
 		if err != nil {
 			fmt.Fprintf(stdout, "error   %s\n", err)
 			status = 1
