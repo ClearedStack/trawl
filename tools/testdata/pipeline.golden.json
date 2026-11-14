@@ -1,0 +1,284 @@
+[
+  {
+    "id": "PA-0001",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Wage calculator",
+    "address": "https://tools.agency-example.gov/wage",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    }
+  },
+  {
+    "id": "PA-0002",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Wage calculator",
+    "address": "https://Tools.Agency-Example.gov/wage/?utm_source=newsletter",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://tools.agency-example.gov/wage",
+        "title": "Wage calculator",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    }
+  },
+  {
+    "id": "PA-0003",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Rate table helper",
+    "address": "https://calc.depot-example.mil/rates",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "site-form",
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Rate table helper",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    }
+  },
+  {
+    "id": "PA-0004",
+    "state": "rejected",
+    "lane": "normal",
+    "source": "site-form",
+    "title": "Made-up admin page",
+    "address": "http://localhost:8080/admin",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "reason": "host_not_public",
+        "code": "E_PARSE",
+        "fingerprint": "0ea70552d0f7"
+      }
+    }
+  },
+  {
+    "id": "PA-0005",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://tools.agency-example.gov/wage-calculator",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://tools.agency-example.gov/wage-calculator",
+        "title": "Made-up notice: wage survey support",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0006",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0007",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: wage survey support",
+    "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      }
+    }
+  },
+  {
+    "id": "PA-0008",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "sam-gov",
+    "title": "Made-up notice: depot rate study",
+    "address": "https://calc.depot-example.mil/Rate-Calculator",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "sam-gov",
+        "address": "https://calc.depot-example.mil/Rate-Calculator",
+        "title": "Made-up notice: depot rate study",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a002"
+      }
+    }
+  },
+  {
+    "id": "PA-0009",
+    "state": "recorded",
+    "lane": "normal",
+    "source": "github-issues",
+    "title": "Forms library",
+    "address": "https://forms.agency-example.gov/library",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "github-issues",
+        "address": "https://forms.agency-example.gov/library",
+        "title": "Forms library",
+        "kind": "paperwork",
+        "via": "github-issues#26"
+      }
+    }
+  },
+  {
+    "id": "PA-0010",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Wage floor calculator",
+    "address": "https://www.agency-example.gov/tools/wage-floor",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/tools/wage-floor",
+        "title": "Wage floor calculator",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0011",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Cost estimators",
+    "address": "https://www.agency-example.gov/small-business/estimators",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/small-business/estimators",
+        "title": "Cost estimators",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0012",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Forms library",
+    "address": "https://www.agency-example.gov/forms",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/forms",
+        "title": "Forms library",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0013",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "A made-up vendor product",
+    "address": "https://vendor.example.com/products/proposal-builder",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://vendor.example.com/products/proposal-builder",
+        "title": "A made-up vendor product",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0014",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Readiness checklist (PDF)",
+    "address": "https://www.agency-example.gov/downloads/readiness.pdf",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/downloads/readiness.pdf",
+        "title": "Readiness checklist (PDF)",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  },
+  {
+    "id": "PA-0015",
+    "state": "recorded",
+    "lane": "backfill",
+    "source": "web-sweep",
+    "title": "Search finder",
+    "address": "https://www.agency-example.gov/search?q=a&sort=new",
+    "next": "sextant",
+    "attempts": 0,
+    "results": {
+      "trawl": {
+        "source": "web-sweep",
+        "address": "https://www.agency-example.gov/search?q=a\u0026sort=new",
+        "title": "Search finder",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    }
+  }
+]

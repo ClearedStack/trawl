@@ -1,0 +1,39 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://tools.agency-example.gov/wage-calculator",
+        "title": "Made-up notice: wage survey support",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a001",
+        "changed": true
+      },
+      {
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/statement-of-work.pdf",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      },
+      {
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a001/question-form.docx",
+        "title": "Made-up notice: wage survey support",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a001"
+      },
+      {
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Made-up notice: depot rate study",
+        "kind": "link",
+        "via": "sam-gov:0000000000000000000000000000a002",
+        "changed": true
+      },
+      {
+        "address": "https://calc.depot-example.mil/Rate-Calculator",
+        "title": "Made-up notice: depot rate study",
+        "kind": "calculator",
+        "via": "sam-gov:0000000000000000000000000000a002",
+        "changed": true
+      }
+    ]
+  }
+}

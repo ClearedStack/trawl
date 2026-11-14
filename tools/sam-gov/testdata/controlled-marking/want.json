@@ -1,0 +1,20 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://example.org/kept",
+        "title": "Made-up notice: clean",
+        "kind": "link",
+        "via": "sam-gov:0000000000000000000000000000a00e"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "controlled_marking",
+        "fingerprint": "d98f6ef0c832"
+      }
+    ]
+  }
+}

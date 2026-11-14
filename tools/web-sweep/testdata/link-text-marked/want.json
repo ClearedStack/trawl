@@ -1,0 +1,20 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://www.agency-example.gov/library/worksheet-b",
+        "title": "Guide to CUI marking worksheet",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/library"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "controlled_marking",
+        "fingerprint": "b371392397e1"
+      }
+    ]
+  }
+}

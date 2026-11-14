@@ -1,0 +1,44 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://notices.agency-example.gov/files/0000000000000000000000000000a00b/a.pdf",
+        "title": "Made-up notice: the good one",
+        "kind": "attachment",
+        "via": "sam-gov:0000000000000000000000000000a00b"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "93a7eec62bcf"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "00f97077be98"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "75101adf28c6"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "9cb27303dce0"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "sam-gov",
+        "reason": "bad_notice",
+        "fingerprint": "d59c92cb47b0"
+      }
+    ]
+  }
+}

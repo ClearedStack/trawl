@@ -1,0 +1,53 @@
+[
+  {
+    "name": "lower case escape",
+    "input": "https://tools.agency-example.gov/wage%2fcalc",
+    "url": "https://tools.agency-example.gov/wage%2Fcalc",
+    "sha256": "a9b80314aae1c008f251c0f0cf9da7314dad1a5770e94acf52b1b1e6f264b9f1",
+    "applied": [
+      "percent-encoding"
+    ]
+  },
+  {
+    "name": "lower case escape in query",
+    "input": "https://tools.agency-example.gov/wage?q=a%3db",
+    "url": "https://tools.agency-example.gov/wage?q=a%3Db",
+    "sha256": "65a36691ae7309bbd230158038212d345895fc1f1d1d77bb1dc21b6c4caabd1c",
+    "applied": [
+      "percent-encoding"
+    ]
+  },
+  {
+    "name": "accented letter in path",
+    "input": "https://tools.agency-example.gov/café",
+    "url": "https://tools.agency-example.gov/caf%C3%A9",
+    "sha256": "00f06801b45965e0483a25640d66c835827a5f9e20508581072b309be2251eb3",
+    "applied": [
+      "percent-encoding"
+    ]
+  },
+  {
+    "name": "angle brackets in query",
+    "input": "https://tools.agency-example.gov/find?q=<b>wage</b>",
+    "url": "https://tools.agency-example.gov/find?q=%3Cb%3Ewage%3C/b%3E",
+    "sha256": "cfc1dc61febfb768162a2f971d29f8a8cd0f93fa4834bd00f9306893710164b9",
+    "applied": [
+      "percent-encoding"
+    ]
+  },
+  {
+    "name": "quote, braces, pipe, caret, backtick",
+    "input": "https://tools.agency-example.gov/a\"b{c}d|e^f`g",
+    "url": "https://tools.agency-example.gov/a%22b%7Bc%7Dd%7Ce%5Ef%60g",
+    "sha256": "9aa149515fc2d8baca5b9bee0d519e242f44e65457caa25253165ede735acabc",
+    "applied": [
+      "percent-encoding"
+    ]
+  },
+  {
+    "name": "upper case escape is kept",
+    "input": "https://tools.agency-example.gov/wage%2Fcalc",
+    "url": "https://tools.agency-example.gov/wage%2Fcalc",
+    "sha256": "a9b80314aae1c008f251c0f0cf9da7314dad1a5770e94acf52b1b1e6f264b9f1"
+  }
+]

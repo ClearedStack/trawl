@@ -1,0 +1,9 @@
+{
+  "number": 51,
+  "labels": [
+    {
+      "name": "tool-suggestion"
+    }
+  ],
+  "body": "### Tool address\n\nhttps://example.org/one and https://example.org/two\n\n### Tool name\n\n_No response_\n\n### What it does\n\n_No response_\n"
+}

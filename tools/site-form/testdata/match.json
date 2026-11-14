@@ -1,0 +1,32 @@
+[
+  {
+    "source": "site-form",
+    "format": "site-form.v1",
+    "match": true
+  },
+  {
+    "source": "site-form",
+    "format": "site-form.v2",
+    "match": false
+  },
+  {
+    "source": "site-form",
+    "format": "",
+    "match": false
+  },
+  {
+    "source": "Site-Form",
+    "format": "site-form.v1",
+    "match": false
+  },
+  {
+    "source": "github-issues",
+    "format": "site-form.v1",
+    "match": false
+  },
+  {
+    "source": "",
+    "format": "",
+    "match": false
+  }
+]

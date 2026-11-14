@@ -1,0 +1,6 @@
+{
+  "source": "web-sweep",
+  "format": "web-sweep.page.v1",
+  "url": "https://www.agency-example.gov/old/page.htm",
+  "content_type": "application/xhtml+xml"
+}

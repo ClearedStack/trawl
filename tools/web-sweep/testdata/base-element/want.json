@@ -1,0 +1,25 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://tools.agency-example.gov/wage-calculator",
+        "title": "Wage calculator",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "address": "https://tools.agency-example.gov/templates",
+        "title": "Templates",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
+      },
+      {
+        "address": "https://tools.agency-example.gov/catalog?page=2",
+        "title": "More tools",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    ]
+  }
+}

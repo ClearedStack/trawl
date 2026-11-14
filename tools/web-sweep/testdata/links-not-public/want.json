@@ -1,0 +1,32 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://tools.agency-example.gov/checklist",
+        "title": "Public checklist",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/intranet-links"
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "18896474deb6"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "2791d18093aa"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "web-sweep",
+        "reason": "host_not_public",
+        "fingerprint": "82e6293f483f"
+      }
+    ]
+  }
+}

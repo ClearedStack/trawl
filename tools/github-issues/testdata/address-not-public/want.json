@@ -1,0 +1,12 @@
+{
+  "result": {
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "host_not_public",
+        "fingerprint": "f34469eb18c9"
+      }
+    ]
+  }
+}

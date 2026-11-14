@@ -1,0 +1,58 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://www.agency-example.gov/tools/wage-floor",
+        "title": "Wage floor calculator",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
+      },
+      {
+        "address": "https://www.agency-example.gov/small-business/estimators",
+        "title": "Cost estimators",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
+      },
+      {
+        "address": "https://www.agency-example.gov/forms",
+        "title": "Forms library",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
+      },
+      {
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Depot rate lookup",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources",
+        "changed": true
+      },
+      {
+        "address": "https://vendor.example.com/products/proposal-builder",
+        "title": "A made-up vendor product",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "address": "https://www.agency-example.gov/downloads/readiness.pdf",
+        "title": "Readiness checklist (PDF)",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "address": "https://www.agency-example.gov/tools/wage-floor",
+        "title": "Wage floor tool, again",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      },
+      {
+        "address": "https://www.agency-example.gov/search?q=a&sort=new",
+        "title": "Search finder",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/small-business/resources"
+      }
+    ]
+  }
+}

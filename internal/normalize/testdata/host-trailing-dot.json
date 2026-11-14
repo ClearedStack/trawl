@@ -1,0 +1,25 @@
+[
+  {
+    "name": "one trailing dot",
+    "input": "https://tools.agency-example.gov./wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "host-trailing-dot"
+    ]
+  },
+  {
+    "name": "trailing dot with port",
+    "input": "https://tools.agency-example.gov.:8443/wage",
+    "url": "https://tools.agency-example.gov:8443/wage",
+    "sha256": "0cedb1c3ea71bdbc5b37b9b3159fd3425c21c0a0ec97a6d8bef4a55d73852cf9",
+    "applied": [
+      "host-trailing-dot"
+    ]
+  },
+  {
+    "name": "two trailing dots are refused",
+    "input": "https://tools.agency-example.gov../wage",
+    "error": "E_PARSE reason=bad_host fp=70146014ec16"
+  }
+]

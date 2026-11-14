@@ -1,0 +1,104 @@
+[
+  {
+    "name": "user name",
+    "input": "https://clerk@tools.agency-example.gov/",
+    "error": "E_PARSE reason=userinfo fp=77749cc6e7ed"
+  },
+  {
+    "name": "user name and password",
+    "input": "https://clerk:made-up@tools.agency-example.gov/",
+    "error": "E_PARSE reason=userinfo fp=b7736ce9ca3c"
+  },
+  {
+    "name": "ipv4 address",
+    "input": "https://192.0.2.10/wage",
+    "error": "E_PARSE reason=host_not_public fp=5906b6fab5c9"
+  },
+  {
+    "name": "ipv4 address with port",
+    "input": "http://192.0.2.10:8080/",
+    "error": "E_PARSE reason=host_not_public fp=f8600faf13bd"
+  },
+  {
+    "name": "ipv6 address",
+    "input": "https://[2001:db8::1]/wage",
+    "error": "E_PARSE reason=host_not_public fp=e5c6369a7ef2"
+  },
+  {
+    "name": "address as one number",
+    "input": "http://3232235777/",
+    "error": "E_PARSE reason=host_not_public fp=ecdd4d001b70"
+  },
+  {
+    "name": "address in hex and decimal",
+    "input": "http://0xc0.0.2.10/",
+    "error": "E_PARSE reason=host_not_public fp=903cea0935d9"
+  },
+  {
+    "name": "localhost",
+    "input": "http://localhost/admin",
+    "error": "E_PARSE reason=host_not_public fp=3ac7ec5cc455"
+  },
+  {
+    "name": "single label",
+    "input": "https://intranet/tools",
+    "error": "E_PARSE reason=host_not_public fp=8f18ea0ec1d3"
+  },
+  {
+    "name": "dot local",
+    "input": "https://printer.local/",
+    "error": "E_PARSE reason=host_not_public fp=aae52a212912"
+  },
+  {
+    "name": "cluster name",
+    "input": "http://muster.cs-core.svc.cluster.local/v1/lease",
+    "error": "E_PARSE reason=host_not_public fp=7259dd3cd551"
+  },
+  {
+    "name": "dot internal",
+    "input": "https://wiki.corp.internal/",
+    "error": "E_PARSE reason=host_not_public fp=448e92ab181d"
+  },
+  {
+    "name": "dot svc",
+    "input": "http://muster.cs-core.svc/",
+    "error": "E_PARSE reason=host_not_public fp=64fbdf58d4b5"
+  },
+  {
+    "name": "reserved test suffix",
+    "input": "https://tools.agency.test/",
+    "error": "E_PARSE reason=host_not_public fp=885baa57bf80"
+  },
+  {
+    "name": "reserved example suffix",
+    "input": "https://tools.agency.example/",
+    "error": "E_PARSE reason=host_not_public fp=a415bf01cdc5"
+  },
+  {
+    "name": "onion",
+    "input": "https://abcdefabcdef.onion/",
+    "error": "E_PARSE reason=host_not_public fp=4b8f1f4d256f"
+  },
+  {
+    "name": "reverse lookup name",
+    "input": "https://10.2.0.192.in-addr.arpa/",
+    "error": "E_PARSE reason=host_not_public fp=1eb0d660c3eb"
+  },
+  {
+    "name": "host outside ascii is paused",
+    "input": "https://bücher.example.com/katalog",
+    "error": "E_NEEDS_SUBTOOL reason=idn_host fp=44ec8b606b55"
+  },
+  {
+    "name": "punycode host is accepted",
+    "input": "https://xn--bcher-kva.example.com/katalog",
+    "url": "https://xn--bcher-kva.example.com/katalog",
+    "sha256": "f11d1f179611b95690c62883bd1b54d7e7d6a0c81b47a89dcca5656ce83abf57"
+  },
+  {
+    "name": "public host is accepted",
+    "input": "https://calc.depot-example.mil/rates",
+    "url": "https://calc.depot-example.mil/rates",
+    "sha256": "162355975efc252366b513bd1817cc1bfea9c23d7f8b14cb52fd73d59ade7f40"
+  }
+]

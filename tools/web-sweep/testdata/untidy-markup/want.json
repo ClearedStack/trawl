@@ -1,0 +1,47 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://www.agency-example.gov/old/Calculator.ASP",
+        "title": "RATE CALCULATOR",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/old/worksheet.htm",
+        "title": "Planning worksheet",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/old/checklist.htm",
+        "title": "Checklist for bidders",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/right/template",
+        "title": "Right one",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/old/tools/wizard",
+        "title": "Setup & guide",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/old/generator.htm",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      },
+      {
+        "address": "https://www.agency-example.gov/last/toolkit",
+        "title": "Unclosed toolkit link",
+        "kind": "link",
+        "via": "https://www.agency-example.gov/old/page.htm"
+      }
+    ]
+  }
+}

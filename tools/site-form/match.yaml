@@ -1,0 +1,10 @@
+# site-form handles a candidate a visitor sent through the form on
+# clearedstack.com. Conn files it with the hub, which checks the visitor's
+# proof of work and daily limit. Trawl leases the item like any other and
+# reads what was recorded. This sub-tool never reads an address.
+tool: site-form
+match:
+  source: site-form
+  formats:
+    - site-form.v1
+input: inline

@@ -1,0 +1,6 @@
+{
+  "source": "sam-gov",
+  "format": "sam-gov.opportunities.v2",
+  "url": "https://feed.agency-example.gov/opportunities/v2/search?limit=10",
+  "content_type": "application/json"
+}

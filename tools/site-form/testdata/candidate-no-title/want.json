@@ -1,0 +1,11 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://forms.agency-example.gov/library",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    ]
+  }
+}

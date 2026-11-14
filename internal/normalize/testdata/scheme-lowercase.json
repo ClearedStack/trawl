@@ -1,0 +1,26 @@
+[
+  {
+    "name": "upper case https",
+    "input": "HTTPS://tools.agency-example.gov/wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "scheme-lowercase"
+    ]
+  },
+  {
+    "name": "mixed case http",
+    "input": "Http://tools.agency-example.gov/wage",
+    "url": "http://tools.agency-example.gov/wage",
+    "sha256": "4707a288b290b2b7de0ce215fa37adb85e2d90b8b57b73cfce7441b4f8025ddf",
+    "applied": [
+      "scheme-lowercase"
+    ]
+  },
+  {
+    "name": "already lower case",
+    "input": "https://tools.agency-example.gov/wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d"
+  }
+]

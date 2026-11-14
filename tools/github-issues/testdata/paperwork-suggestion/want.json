@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://forms.agency-example.gov/library/form-000.pdf",
+        "title": "Made-up form 000",
+        "kind": "paperwork",
+        "via": "github-issues#15"
+      }
+    ]
+  }
+}

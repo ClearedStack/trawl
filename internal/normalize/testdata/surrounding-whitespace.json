@@ -1,0 +1,34 @@
+[
+  {
+    "name": "leading and trailing spaces",
+    "input": "  https://tools.agency-example.gov/wage  ",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "surrounding-whitespace"
+    ]
+  },
+  {
+    "name": "trailing newline",
+    "input": "https://tools.agency-example.gov/wage\n",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "surrounding-whitespace"
+    ]
+  },
+  {
+    "name": "tab and carriage return",
+    "input": "\thttps://tools.agency-example.gov/wage\r\n",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "surrounding-whitespace"
+    ]
+  },
+  {
+    "name": "space inside is refused",
+    "input": "https://tools.agency-example.gov/wage calc",
+    "error": "E_PARSE reason=control_char fp=a2203b762d12"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Rate table helper",
+        "kind": "submission",
+        "via": "site-form"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://example.org/tool",
+        "title": "Made-up notice title",
+        "kind": "link",
+        "via": "sam-gov:0000000000000000000000000000a010"
+      }
+    ]
+  }
+}

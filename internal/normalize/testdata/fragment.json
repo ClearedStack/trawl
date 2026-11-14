@@ -1,0 +1,38 @@
+[
+  {
+    "name": "named fragment",
+    "input": "https://tools.agency-example.gov/wage#results",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "fragment"
+    ]
+  },
+  {
+    "name": "empty fragment",
+    "input": "https://tools.agency-example.gov/wage#",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "fragment"
+    ]
+  },
+  {
+    "name": "fragment after query",
+    "input": "https://tools.agency-example.gov/wage?state=va#results",
+    "url": "https://tools.agency-example.gov/wage?state=va",
+    "sha256": "e7489ec98cb8e324dabbd69bfae0b1498746ac0b7c10770fbb7340c62982682e",
+    "applied": [
+      "fragment"
+    ]
+  },
+  {
+    "name": "fragment that looks like a query",
+    "input": "https://tools.agency-example.gov/wage#?state=va",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "fragment"
+    ]
+  }
+]

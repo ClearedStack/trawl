@@ -1,0 +1,53 @@
+[
+  {
+    "name": "keys out of order",
+    "input": "https://tools.agency-example.gov/wage?year=2031&state=va",
+    "url": "https://tools.agency-example.gov/wage?state=va&year=2031",
+    "sha256": "b9c699799210c6b6f9a953b39c03696e3114d1faa8eff3c33616ed5ac0266238",
+    "applied": [
+      "query-order"
+    ]
+  },
+  {
+    "name": "repeated key keeps its order",
+    "input": "https://tools.agency-example.gov/wage?tag=b&area=1&tag=a",
+    "url": "https://tools.agency-example.gov/wage?area=1&tag=b&tag=a",
+    "sha256": "16b55f36a08ee63d64ba4f48fdefa8e2d4be7dfbdb862c34411bbecf4887aafd",
+    "applied": [
+      "query-order"
+    ]
+  },
+  {
+    "name": "empty pairs",
+    "input": "https://tools.agency-example.gov/wage?&state=va&&year=2031&",
+    "url": "https://tools.agency-example.gov/wage?state=va&year=2031",
+    "sha256": "b9c699799210c6b6f9a953b39c03696e3114d1faa8eff3c33616ed5ac0266238",
+    "applied": [
+      "query-order"
+    ]
+  },
+  {
+    "name": "bare question mark",
+    "input": "https://tools.agency-example.gov/wage?",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "query-order"
+    ]
+  },
+  {
+    "name": "key without value",
+    "input": "https://tools.agency-example.gov/wage?print&area=1",
+    "url": "https://tools.agency-example.gov/wage?area=1&print",
+    "sha256": "a7cae8aea672bb6e5060ff942d2c90d564e75672136bbcd0c3dae0162a940518",
+    "applied": [
+      "query-order"
+    ]
+  },
+  {
+    "name": "already in order",
+    "input": "https://tools.agency-example.gov/wage?area=1&state=va",
+    "url": "https://tools.agency-example.gov/wage?area=1&state=va",
+    "sha256": "0f9c7db4e670fa4fe0845ec043c1df64226a25ee0ed7b3af1dfadc0ecb44ce8f"
+  }
+]

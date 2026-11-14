@@ -1,0 +1,28 @@
+[
+  {
+    "name": "ftp",
+    "input": "ftp://files.agency-example.gov/forms.zip",
+    "error": "E_PARSE reason=scheme_not_public fp=5b2d891ca66b"
+  },
+  {
+    "name": "file",
+    "input": "file:///etc/hosts",
+    "error": "E_PARSE reason=scheme_not_public fp=ebe28c068a44"
+  },
+  {
+    "name": "javascript-style",
+    "input": "javascript://tools.agency-example.gov/%0Aalert(1)",
+    "error": "E_PARSE reason=scheme_not_public fp=2f57d2bfeb13"
+  },
+  {
+    "name": "upper case ftp",
+    "input": "FTP://files.agency-example.gov/forms.zip",
+    "error": "E_PARSE reason=scheme_not_public fp=c1d919d68646"
+  },
+  {
+    "name": "http is kept as http",
+    "input": "http://tools.agency-example.gov/wage",
+    "url": "http://tools.agency-example.gov/wage",
+    "sha256": "4707a288b290b2b7de0ce215fa37adb85e2d90b8b57b73cfce7441b4f8025ddf"
+  }
+]

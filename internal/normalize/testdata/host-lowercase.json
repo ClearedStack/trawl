@@ -1,0 +1,29 @@
+[
+  {
+    "name": "upper case host",
+    "input": "https://TOOLS.Agency-Example.GOV/wage",
+    "url": "https://tools.agency-example.gov/wage",
+    "sha256": "4f224a35258b04c87bebd7a0ab0edd93a83c8ccb7b9434e23fb9970f355f640d",
+    "applied": [
+      "host-lowercase"
+    ]
+  },
+  {
+    "name": "path case is kept",
+    "input": "https://Tools.agency-example.gov/Wage/Calc",
+    "url": "https://tools.agency-example.gov/Wage/Calc",
+    "sha256": "2bd7e61289cdacd6740080f5f62abaed2ed70e8d56149036848f5d2df08d1f29",
+    "applied": [
+      "host-lowercase"
+    ]
+  },
+  {
+    "name": "www is kept",
+    "input": "https://WWW.agency-example.gov/",
+    "url": "https://www.agency-example.gov/",
+    "sha256": "2eb22d71565379d09138fd0257a2ee709725c7634a930cb573c95584cb70351e",
+    "applied": [
+      "host-lowercase"
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://tools.agency-example.gov/wage",
+        "kind": "tool",
+        "via": "github-issues#32",
+        "changed": true
+      }
+    ]
+  }
+}

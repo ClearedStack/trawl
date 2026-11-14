@@ -1,0 +1,51 @@
+{
+  "result": {
+    "candidates": [
+      {
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Rate table",
+        "kind": "tool",
+        "via": "github-issues#21"
+      },
+      {
+        "address": "https://forms.agency-example.gov/library",
+        "title": "Forms library",
+        "kind": "paperwork",
+        "via": "github-issues#26"
+      },
+      {
+        "address": "https://calc.depot-example.mil/rates",
+        "title": "Rate table again",
+        "kind": "tool",
+        "via": "github-issues#27",
+        "changed": true
+      }
+    ],
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "no_address",
+        "fingerprint": "bcad3c0244fa"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "bad_issue",
+        "fingerprint": "a97dd3634d80"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "bad_issue",
+        "fingerprint": "d7c0c1e45d1a"
+      },
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "no_body",
+        "fingerprint": "83dac70fc011"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+# github-issues handles suggestions opened as issues on the public
+# repository: one issue, or a list of issues, in the JSON form GitHub
+# serves. Trawl reads the document from an address named in its sources
+# file.
+tool: github-issues
+match:
+  source: github-issues
+  formats:
+    - github-issues.v1
+input: fetch

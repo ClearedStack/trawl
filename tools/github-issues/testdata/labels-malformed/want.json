@@ -1,0 +1,12 @@
+{
+  "result": {
+    "rejects": [
+      {
+        "code": "E_PARSE",
+        "tool": "github-issues",
+        "reason": "bad_issue",
+        "fingerprint": "fdc6b2f95119"
+      }
+    ]
+  }
+}
