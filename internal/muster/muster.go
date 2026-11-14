@@ -80,7 +80,7 @@ type Found struct {
 	Address string `json:"address"`
 }
 
-// Limits the hub puts on a filing, in characters.
+// Limits the hub puts on a filing, in bytes.
 const (
 	MaxTitle   = 200
 	MaxAddress = 2000

@@ -77,7 +77,7 @@ func TestFileLeaseComplete(t *testing.T) {
 	if err != nil || lease == nil {
 		t.Fatalf("Lease: %v, %v", lease, err)
 	}
-	if lease.Lease != "PA-0001.1" || lease.Kind != KindItem || lease.ID != "PA-0001" || lease.State != StateDiscovered ||
+	if lease.Lease != "PA-0001.1.1" || lease.Kind != KindItem || lease.ID != "PA-0001" || lease.State != StateDiscovered ||
 		lease.Lane != "normal" || lease.Attempt != 1 || lease.Expires != "2026-01-05T09:01:00Z" {
 		t.Errorf("lease = %+v", lease)
 	}
@@ -140,12 +140,12 @@ func TestRequestBodies(t *testing.T) {
 		`/v1/items {"contract":"v1","source":"github-issues","title":"A","address":"https://example.org/a"}`,
 		`/v1/items {"contract":"v1","source":"sam-gov","title":"T","address":"https://example.org/b","result":{"kind":"link"}}`,
 		`/v1/lease {"contract":"v1"}`,
-		`/v1/heartbeat {"contract":"v1","lease":"PA-0001.1"}`,
-		`/v1/complete {"contract":"v1","lease":"PA-0001.1","state":"rejected"}`,
+		`/v1/heartbeat {"contract":"v1","lease":"PA-0001.1.1"}`,
+		`/v1/complete {"contract":"v1","lease":"PA-0001.1.1","state":"rejected"}`,
 		`/v1/lease {"contract":"v1"}`,
-		`/v1/fail {"contract":"v1","lease":"PA-0002.2","code":"E_TIMEOUT"}`,
+		`/v1/fail {"contract":"v1","lease":"PA-0002.2.1","code":"E_TIMEOUT"}`,
 		`/v1/lease {"contract":"v1"}`,
-		`/v1/needs_subtool {"contract":"v1","lease":"PA-0002.3"}`,
+		`/v1/needs_subtool {"contract":"v1","lease":"PA-0002.2.2"}`,
 	}
 	var got []string
 	for _, call := range fake.Calls() {
@@ -254,6 +254,8 @@ func TestRefusals(t *testing.T) {
 	_, spaced := c.File(ctx, Filing{Source: SourceSAMGov, Title: "T", Address: "https://example.org/a b"})
 	_, twoLines := c.File(ctx, Filing{Source: SourceSAMGov, Title: "one\ntwo", Address: "https://example.org/"})
 	_, longTitle := c.File(ctx, Filing{Source: SourceSAMGov, Title: strings.Repeat("a", MaxTitle+1), Address: "https://example.org/"})
+	// The limit is in bytes: 101 two-byte letters are 202 bytes.
+	_, wideTitle := c.File(ctx, Filing{Source: SourceSAMGov, Title: strings.Repeat("\u00e9", MaxTitle/2+1), Address: "https://example.org/"})
 	_, onlyMarkup := c.File(ctx, Filing{Source: SourceSAMGov, Title: "<b></b>", Address: "https://example.org/"})
 	_, stranger := c.File(ctx, Filing{Source: "made-up-source", Title: "T", Address: "https://example.org/"})
 	// Trawl has no visitor and no proof of work, so it cannot file as
@@ -267,7 +269,7 @@ func TestRefusals(t *testing.T) {
 		cause  string
 		kind   error
 	}{
-		{"a lease never given", c.Heartbeat(ctx, "PA-0009.9"), 409, "lease_not_held", ErrConflict},
+		{"a lease never given", c.Heartbeat(ctx, "PA-0009.9.1"), 409, "lease_not_held", ErrConflict},
 		{"a move not in the table", c.Complete(ctx, lease.Lease, "observed", nil), 409, "move_not_allowed", ErrConflict},
 		{"no lease named", c.Heartbeat(ctx, ""), 400, "missing_field", ErrRefused},
 		{"no state named", c.Complete(ctx, lease.Lease, "", nil), 400, "missing_field", ErrRefused},
@@ -278,6 +280,7 @@ func TestRefusals(t *testing.T) {
 		{"an address with a space", spaced, 400, "bad_field", ErrRefused},
 		{"a title of two lines", twoLines, 400, "bad_field", ErrRefused},
 		{"a title too long", longTitle, 400, "bad_field", ErrRefused},
+		{"a title too long in bytes", wideTitle, 400, "bad_field", ErrRefused},
 		{"a title that is only markup", onlyMarkup, 400, "bad_field", ErrRefused},
 		{"an unknown source", stranger, 422, "unknown_value", ErrRefused},
 		{"a site-form filing by Trawl", asForm, 400, "missing_field", ErrRefused},
@@ -380,7 +383,7 @@ func TestFakeIsStrict(t *testing.T) {
 		{"unknown contract", "POST", "/v1/lease", trawlToken, "application/json", `{"contract":"v2"}`, 422, "E_NEEDS_SUBTOOL"},
 		{"worker named in a lease request", "POST", "/v1/lease", trawlToken, "application/json", `{"contract":"v1","worker":"trawl"}`, 400, "E_PARSE"},
 		{"lane named in a lease request", "POST", "/v1/lease", trawlToken, "application/json", `{"contract":"v1","lane":"urgent"}`, 400, "E_PARSE"},
-		{"lease_id instead of lease", "POST", "/v1/heartbeat", trawlToken, "application/json", `{"contract":"v1","lease_id":"PA-0001.1"}`, 400, "E_PARSE"},
+		{"lease_id instead of lease", "POST", "/v1/heartbeat", trawlToken, "application/json", `{"contract":"v1","lease_id":"PA-0001.1.1"}`, 400, "E_PARSE"},
 		{"a hash key on a filing", "POST", "/v1/items", trawlToken, "application/json", `{"contract":"v1","source":"sam-gov","title":"T","address":"https://example.org/","sha256":"00"}`, 400, "E_PARSE"},
 		{"too large", "POST", "/v1/items", trawlToken, "application/json", `{"contract":"v1","source":"sam-gov","title":"` + strings.Repeat("a", maxRequest) + `","address":"https://example.org/"}`, 413, "E_PARSE"},
 	}
@@ -502,7 +505,7 @@ func TestErrorsNameNothing(t *testing.T) {
 	}))
 	defer leaky.Close()
 	c, _ = NewHTTP(leaky.URL, "", time.Second)
-	err = c.Heartbeat(ctx, "PA-0001.1")
+	err = c.Heartbeat(ctx, "PA-0001.1.1")
 	if !errors.Is(err, ErrConflict) {
 		t.Fatalf("err = %v", err)
 	}

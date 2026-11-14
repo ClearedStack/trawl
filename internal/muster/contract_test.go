@@ -86,9 +86,7 @@ func sortedNames(m map[string]example) []string {
 // notCovered lists the examples the fake hub does not replay, each with
 // the reason. Everything else must pass exactly.
 var notCovered = map[string]string{
-	"complete-keep":                        "release steps for held items are not in the fake",
-	"complete-release":                     "release steps for held items are not in the fake",
-	"lease-release":                        "release steps for held items are not in the fake",
+	"release":                              "releasing a held item is Countersign's call and is not in the fake",
 	"lease-incident":                       "incident steps are not in the fake",
 	"complete-proposal":                    "edit proposals are not in the fake",
 	"lease-proposal":                       "edit proposals are not in the fake",

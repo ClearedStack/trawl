@@ -1,7 +1,7 @@
 # Muster contract v1 examples
 
 The files in `examples/` are copied unchanged from the Muster repository:
-folder `contract/v1/examples/`, commit `7706321` on branch
+folder `contract/v1/examples/`, commit `a362cb1` on branch
 `claude/repo-build-prompt-1csgx6`. The contract they belong to is
 `contract/v1/CONTRACT.md` in that repository.
 

@@ -17,6 +17,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"strings"
 	"sync/atomic"
 	"time"
 	"unicode/utf8"
@@ -570,16 +571,21 @@ func (w *Worker) file(ctx context.Context, st Staged) error {
 	return nil
 }
 
-// filing builds the hub's filing for a record. The hub requires a title.
-// A candidate that came with none is filed under its own address, cut to
-// the longest title the hub accepts.
+// filing builds the hub's filing for a record. The hub requires a title
+// of at most 200 bytes. A candidate that came with none is filed under
+// its own address, and a title that is too long in bytes is cut at the
+// last whole character that fits.
 func filing(rec Record) muster.Filing {
 	title := rec.Title
 	if title == "" {
 		title = rec.Address
-		if utf8.RuneCountInString(title) > muster.MaxTitle {
-			title = string([]rune(title)[:muster.MaxTitle])
+	}
+	if len(title) > muster.MaxTitle {
+		cut := muster.MaxTitle
+		for cut > 0 && !utf8.RuneStart(title[cut]) {
+			cut--
 		}
+		title = strings.TrimRight(title[:cut], " ")
 	}
 	return muster.Filing{Source: rec.Source, Title: title, Address: rec.Address, Result: rec}
 }

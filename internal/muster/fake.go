@@ -47,7 +47,6 @@ type Fake struct {
 	byID     map[string]*fakeItem
 	byAddr   map[string]*fakeItem
 	leases   map[string]*fakeLease
-	leaseSeq int
 	arrivals int
 	calls    []Call
 }
@@ -103,8 +102,10 @@ type FakeItem struct {
 // worker's step is queued.
 type step struct {
 	worker, from, to, next string
-	// later marks a step that is offered only after seven days.
+	// later marks a step that is offered only after seven days, in the
+	// backfill lane. lane, when set, is the lane the next step goes in.
 	later bool
+	lane  string
 }
 
 var steps = []step{
@@ -128,7 +129,10 @@ var steps = []step{
 	{worker: "chartroom", from: "merged", to: "merged"},
 	{worker: "chartroom", from: "retired", to: "retired"},
 	{worker: "tidegauge", from: "live", to: "live", next: "tidegauge", later: true},
-	{worker: "tidegauge", from: "live", to: "retired", next: "chartroom"},
+	{worker: "tidegauge", from: "live", to: "retired", next: "chartroom", lane: "urgent"},
+	{worker: "tidegauge", from: "live", to: "building", next: "waybill", lane: "urgent"},
+	{worker: "waybill", from: "building", to: "building", next: "moldloft"},
+	{worker: "moldloft", from: "building", to: "building", next: "shakedown"},
 }
 
 // pausable are the states the state table lets move to needs_subtool.
@@ -217,6 +221,10 @@ func (f *Fake) add(it FakeItem) *fakeItem {
 	}
 	if it.Lane == "" {
 		it.Lane = "normal"
+	}
+	if it.State == "live" && it.Next == "" {
+		// A live item always has its next check waiting.
+		it.Next = "tidegauge"
 	}
 	f.arrivals++
 	item := &fakeItem{FakeItem: it, order: f.arrivals, results: map[string]json.RawMessage{}}
@@ -438,10 +446,11 @@ func (f *Fake) lease(caller string, body []byte) (int, any) {
 		return open[i].order < open[j].order
 	})
 	it := open[0]
-	f.leaseSeq++
-	id := fmt.Sprintf("%s.%d", it.ID, f.leaseSeq)
-	it.lease, it.expires = id, f.now.Add(f.leaseFor)
 	it.Attempts++
+	// A lease names the step, its place in the order of arrival, and
+	// the attempt. Callers hand it back as given and read nothing in it.
+	id := fmt.Sprintf("%s.%d.%d", it.ID, it.order, it.Attempts)
+	it.lease, it.expires = id, f.now.Add(f.leaseFor)
 	f.leases[id] = &fakeLease{item: it, caller: caller}
 
 	answer := leaseAnswer{
@@ -546,6 +555,9 @@ func (f *Fake) complete(caller string, body []byte) (int, any) {
 		it.notBefore = f.now.Add(7 * 24 * time.Hour)
 		it.Lane = "backfill"
 	}
+	if row.lane != "" {
+		it.Lane = row.lane
+	}
 	if len(bytes.TrimSpace(req.Result)) > 0 {
 		it.results[caller] = req.Result
 	}
@@ -641,8 +653,8 @@ func (f *Fake) file(caller string, body []byte) (int, any) {
 		return utf8.ValidString(s)
 	}
 	if !sourceForm.MatchString(req.Source) || !object(req.Result) ||
-		utf8.RuneCountInString(req.Title) > MaxTitle || !oneLine(req.Title) ||
-		utf8.RuneCountInString(req.Address) > MaxAddress || !unbroken(req.Address) {
+		len(req.Title) > MaxTitle || !oneLine(req.Title) ||
+		len(req.Address) > MaxAddress || !unbroken(req.Address) {
 		return refuseBadField.status, refuseBadField
 	}
 	lane, known := sourceLanes[req.Source]

@@ -12,7 +12,7 @@
 
 ---
 
-> **Status: built against Muster's contract v1, not yet deployed.** The code and its tests are here and pass. Trawl speaks [contract v1](https://github.com/ClearedStack/muster/blob/claude/repo-build-prompt-1csgx6/contract/v1/CONTRACT.md) and replays Muster's own saved examples in its tests. It has not yet been run against a running Muster, and it has never run in a cluster. See [What is not done](#what-is-not-done).
+> **Status: built against Muster's contract v1, not yet deployed.** The code and its tests are here and pass. Trawl speaks [contract v1](https://github.com/ClearedStack/muster/blob/claude/repo-build-prompt-1csgx6/contract/v1/CONTRACT.md) and replays Muster's own saved examples in its tests. It has been run once by hand against a Muster built from source, and never in a cluster. See [What is not done](#what-is-not-done).
 
 Trawl is stage 01 of the ClearedStack pipeline. ClearedStack is an open pipeline that finds ideas for government-contracting tools, screens and scores them, and builds each one from the public rule. Trawl is meant to be understood and used without the rest.
 
@@ -265,11 +265,11 @@ These are for Muster's side to settle. Trawl's behaviour today is stated for eac
 2. **Trawl cannot pause an item.** The state table has no move from `discovered` to `needs_subtool`. When no rule covers a leased item, Trawl calls `needs_subtool`, is refused, and fails the item with `E_PARSE`, which holds it for the owner to release. That is the wrong code for data that is valid and unfamiliar, and such items are not replayed when a new sub-tool ships.
 3. **Nothing reports a failed sweep.** A source that times out or has no rule is logged with its public error and tried again on the next sweep. There is no leased item to fail or pause, so Muster is not told.
 4. **A title is required.** Muster refuses a filing with no title. A candidate found without one, such as a link with no text, is filed under its own address as its title.
-5. **Length limits differ.** Trawl's cleaning accepts an address up to 2,048 bytes and Muster up to 2,000 characters. An address in between is refused by Muster, logged, and the rest of the batch goes on.
+5. **Length limits differ.** Trawl's cleaning accepts an address up to 2,048 bytes and Muster up to 2,000. An address in between is refused by Muster, logged, and the rest of the batch goes on. Muster takes a title of at most 200 bytes, so Trawl cuts a longer one at the last whole character that fits.
 
 ## What is not done
 
-- **A running Muster.** Trawl is tested against a fake hub in `internal/muster` and against a copy of Muster's contract examples. Of the 51 examples, 25 are replayed against the fake and compared exactly; the other 26 concern calls Trawl does not make and are listed with reasons in `contract_test.go`. It has not been pointed at a running Muster.
+- **A standing test against Muster.** Trawl's tests run against a fake hub in `internal/muster` and against a copy of Muster's contract examples. Of the 50 examples at Muster commit `a362cb1`, 26 are replayed against the fake and compared exactly; the other 24 concern calls Trawl does not make and are listed with reasons in `contract_test.go`. The `trawl` binary was also run once by hand against Muster built from that commit, on its in-memory stand-in for Logbook: five items filed as Conn were leased and came out recorded, rejected, superseded or duplicate as the table above says. Sweeps were not part of that run, because the fetcher refuses a web server on the local machine. No test here repeats it.
 - **Kubernetes manifests.** There is no Deployment, ServiceAccount, NetworkPolicy, volume for the spool or ConfigMap for the sources file here. Non-root, dropped capabilities and a read-only root filesystem are settings of the pod.
 - **Live SAM.gov.** Its search API needs a key and Trawl holds no credentials. A `sam-gov` source must be an address that needs no key.
 - **Host names outside ASCII.** They are stopped as `E_NEEDS_SUBTOOL` (`idn_host`). Converting them correctly needs tables the Go standard library does not have.

@@ -341,6 +341,10 @@ func TestTitlesForFiling(t *testing.T) {
 		{Record{Address: wage, Title: "Wage calculator"}, "Wage calculator"},
 		{Record{Address: wage}, wage},
 		{Record{Address: long}, long[:muster.MaxTitle]},
+		// The limit is in bytes. A title of 120 three-byte characters
+		// is cut at the last whole character that fits.
+		{Record{Address: wage, Title: strings.Repeat("\u20ac", 120)}, strings.Repeat("\u20ac", 66)},
+		{Record{Address: wage, Title: strings.Repeat("a", 199) + " \u20ac"}, strings.Repeat("a", 199)},
 	}
 	for _, c := range cases {
 		if got := filing(c.rec); got.Title != c.want || got.Address != c.rec.Address {
