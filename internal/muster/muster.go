@@ -19,8 +19,8 @@
 //	POST /v1/items          {contract, source, title, address, result}
 //
 // The contract itself is contract/v1/CONTRACT.md in the Muster repository.
-// A copy of its saved examples is under testdata and is replayed by the
-// tests here.
+// A copy of its saved examples is in testdata/contract at the top of this
+// repository and is replayed by the tests here.
 package muster
 
 import (

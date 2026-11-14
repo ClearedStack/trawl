@@ -139,7 +139,8 @@ A refusal is sorted by its status. `409` means the lease is gone or the move is 
 | [`cmd/trawl`](cmd/trawl) | The `trawl` command: `normalize`, `work`, `version`. |
 | [`tools/`](tools) | The sub-tools. [`registry.yaml`](tools/registry.yaml) lists them; each folder holds `match.yaml`, the Go logic and `testdata/`. |
 | [`internal/normalize`](internal/normalize) | The address rules and their saved examples. |
-| [`internal/muster`](internal/muster) | The interface to Muster, the HTTP client, a fake hub for tests, and a copy of Muster's contract examples. |
+| [`internal/muster`](internal/muster) | The interface to Muster, the HTTP client and a fake hub for tests. |
+| [`testdata/contract`](testdata/contract) | A copy of Muster's contract v1 examples, replayed by the tests. |
 | [`internal/spool`](internal/spool) | The on-disk queue of work bound for Muster. |
 | [`internal/worker`](internal/worker) | The sweep, file, lease and record loop. |
 | [`internal/fetch`](internal/fetch), [`internal/robots`](internal/robots) | Reading public addresses, and obeying `robots.txt`. |
@@ -269,7 +270,7 @@ These are for Muster's side to settle. Trawl's behaviour today is stated for eac
 
 ## What is not done
 
-- **A standing test against Muster.** Trawl's tests run against a fake hub in `internal/muster` and against a copy of Muster's contract examples. Of the 50 examples at Muster commit `a362cb1`, 26 are replayed against the fake and compared exactly; the other 24 concern calls Trawl does not make and are listed with reasons in `contract_test.go`. The `trawl` binary was also run once by hand against Muster built from that commit, on its in-memory stand-in for Logbook: five items filed as Conn were leased and came out recorded, rejected, superseded or duplicate as the table above says. Sweeps were not part of that run, because the fetcher refuses a web server on the local machine. No test here repeats it.
+- **A standing test against Muster.** Trawl's tests run against a fake hub in `internal/muster` and against a copy of Muster's contract examples. Of the 52 examples at Muster commit `470dddf`, 26 are replayed against the fake and compared exactly; the other 26 concern calls Trawl does not make, or conditions no request can cause, and are listed with reasons in `internal/muster/contract_test.go`. The `trawl` binary was also run once by hand against Muster built from commit `a362cb1`, on its in-memory stand-in for Logbook: five items filed as Conn were leased and came out recorded, rejected, superseded or duplicate as the table above says. Sweeps were not part of that run, because the fetcher refuses a web server on the local machine. No test here repeats it.
 - **Kubernetes manifests.** There is no Deployment, ServiceAccount, NetworkPolicy, volume for the spool or ConfigMap for the sources file here. Non-root, dropped capabilities and a read-only root filesystem are settings of the pod.
 - **Live SAM.gov.** Its search API needs a key and Trawl holds no credentials. A `sam-gov` source must be an address that needs no key.
 - **Host names outside ASCII.** They are stopped as `E_NEEDS_SUBTOOL` (`idn_host`). Converting them correctly needs tables the Go standard library does not have.
@@ -304,7 +305,7 @@ These are for Muster's side to settle. Trawl's behaviour today is stated for eac
 
 - **No AI when it runs.** The same input gives the same output on any machine.
 - **Stop instead of guessing.** A case with no rule is stopped and reported, never improvised.
-- **Clean room.** Written from scratch. No code, text or design is copied from another project. The one exception is `internal/muster/testdata/contract-v1/examples`, which is a copy of the examples that define the contract with Muster, kept so the tests can replay them.
+- **Clean room.** Written from scratch. No code, text or design is copied from another project. The one exception is `testdata/contract`, which is a copy of the examples that define the contract with Muster, kept so the tests can replay them.
 - **Public sources and made-up data only.** Nothing classified, controlled or taken from a real contract, in code, tests, issues or commit messages. Every host, notice, issue and submission in the fixtures is invented.
 
 ## License

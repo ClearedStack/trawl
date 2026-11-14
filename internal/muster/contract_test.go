@@ -45,7 +45,7 @@ type exampleCall struct {
 
 func loadExamples(t *testing.T) map[string]example {
 	t.Helper()
-	files, err := filepath.Glob("testdata/contract-v1/examples/*.json")
+	files, err := filepath.Glob("../../testdata/contract/*.json")
 	if err != nil || len(files) == 0 {
 		t.Fatal("no contract examples")
 	}
@@ -105,6 +105,8 @@ var notCovered = map[string]string{
 	"refused-422-unknown_value-health":     "health reports are not in the fake",
 	"feed":                                 "the live feed is not in the fake",
 	"healthz":                              "the cluster's own check is not in the fake",
+	"refused-400-bad_field-logbook":        "needs the record store to refuse a row, which no request to the fake can cause",
+	"refused-422-unknown_value-logbook":    "needs the record store to lack a rule, which no request to the fake can cause",
 	"refused-500-bad_record":               "needs a damaged stored record, which no request can cause",
 	"refused-500-unexpected":               "needs a fault inside the hub, which no request can cause",
 	"refused-503-busy":                     "needs a hub under load, which no request can cause",
