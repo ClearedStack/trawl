@@ -29,17 +29,38 @@ const memoryLimit = 20 << 20
 // defaultTokenFile is where Kubernetes mounts a pod's ServiceAccount token.
 const defaultTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
+func envOr(name, fallback string) string {
+	if v := os.Getenv(name); v != "" {
+		return v
+	}
+	return fallback
+}
+
 // runWork sweeps the sources, files what it finds with the hub, and leases
 // and records discovered items until it is told to stop. The only
 // directory it writes to is the spool.
 func runWork(args []string, _, stderr io.Writer) int {
+	if cv := os.Getenv("CONTRACT_VERSION"); cv != "" && cv != muster.ContractVersion {
+		fmt.Fprintf(stderr, "CONTRACT_VERSION must be %s\n", muster.ContractVersion)
+		return 2
+	}
+	defaultEvery := 6 * time.Hour
+	if raw := os.Getenv("TRAWL_SWEEP_EVERY"); raw != "" {
+		d, err := time.ParseDuration(raw)
+		if err != nil {
+			fmt.Fprintln(stderr, "TRAWL_SWEEP_EVERY is not a valid duration")
+			return 2
+		}
+		defaultEvery = d
+	}
+
 	fs := flag.NewFlagSet("work", flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	hubURL := fs.String("muster-url", "", "address of the hub, for example http://hub.made-up.svc:8080 (required)")
-	tokenFile := fs.String("token-file", defaultTokenFile, "file holding the ServiceAccount token; empty to send none")
-	spoolDir := fs.String("spool", spool.DefaultDir, "directory where work waits for the hub")
-	sourcesFile := fs.String("sources", "", "JSON file listing the public sources to sweep; empty to sweep nothing")
-	sweepEvery := fs.Duration("sweep-every", 6*time.Hour, "time between sweeps of the sources; 0 to sweep once")
+	hubURL := fs.String("muster-url", envOr("MUSTER_URL", ""), "address of the hub, for example http://hub.made-up.svc:8080 (required)")
+	tokenFile := fs.String("token-file", envOr("TRAWL_TOKEN_FILE", defaultTokenFile), "file holding the ServiceAccount token; empty to send none")
+	spoolDir := fs.String("spool", envOr("TRAWL_SPOOL_DIR", spool.DefaultDir), "directory where work waits for the hub")
+	sourcesFile := fs.String("sources", envOr("TRAWL_SOURCES", ""), "JSON file listing the public sources to sweep; empty to sweep nothing")
+	sweepEvery := fs.Duration("sweep-every", defaultEvery, "time between sweeps of the sources; 0 to sweep once")
 	drain := fs.Bool("drain", false, "sweep once, then stop when there is nothing to lease and the spool is empty")
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -61,7 +82,9 @@ func runWork(args []string, _, stderr io.Writer) int {
 		}
 	}
 
-	debug.SetMemoryLimit(memoryLimit)
+	if os.Getenv("GOMEMLIMIT") == "" {
+		debug.SetMemoryLimit(memoryLimit)
+	}
 	debug.SetGCPercent(50)
 
 	log := slog.New(slog.NewJSONHandler(stderr, nil))

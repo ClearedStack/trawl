@@ -482,16 +482,16 @@ func (w *Worker) Flush(ctx context.Context) error {
 		switch {
 		case err == nil:
 			w.log().Info("acknowledged", "kind", st.Kind, "item", st.ItemID, "source", st.Source)
-		case errors.Is(err, muster.ErrConflict):
-			// The lease ended while the outcome waited. The hub offers
-			// the item again and it is decided afresh.
-			w.log().Info("lease_gone", "item", st.ItemID)
-		case errors.Is(err, muster.ErrRefused):
+		case isMoveNotAllowed(err), errors.Is(err, muster.ErrRefused):
 			w.log().Error("hub_refused", "kind", st.Kind, "item", st.ItemID, "why", refusalText(err))
 			if err := w.Spool.SetAside(name); err != nil {
 				return errSpool
 			}
 			continue
+		case errors.Is(err, muster.ErrConflict):
+			// The lease ended while the outcome waited. The hub offers
+			// the item again and it is decided afresh.
+			w.log().Info("lease_gone", "item", st.ItemID)
 		default:
 			return errHubDown
 		}
@@ -500,6 +500,11 @@ func (w *Worker) Flush(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func isMoveNotAllowed(err error) bool {
+	var r *muster.Refusal
+	return errors.As(err, &r) && r.Cause == "move_not_allowed"
 }
 
 // refusalText describes a refusal by its status, code and cause. The
@@ -526,15 +531,13 @@ func (w *Worker) send(ctx context.Context, st Staged) error {
 		cctx, cancel := w.call(ctx)
 		err := w.Hub.NeedsSubtool(cctx, st.Lease)
 		cancel()
-		if !errors.Is(err, muster.ErrConflict) {
+		if !isMoveNotAllowed(err) {
 			return err
 		}
-		// The hub does not let this item be paused, or the lease is
-		// gone. Contract v1 has no move from discovered to
-		// needs_subtool, so this is the usual path for Trawl. The item
-		// is failed as E_PARSE instead, which holds it for the owner
-		// to release; if the lease is gone this is refused too and the
-		// entry is dropped.
+		// Contract v1 has no move from discovered to needs_subtool, so
+		// Muster refuses with move_not_allowed while the lease is still
+		// held. The item is failed as E_PARSE instead, which holds it
+		// for the owner to release rather than offering it in a loop.
 		w.log().Warn("pause_refused", "item", st.ItemID, "reason", st.Reason, "fp", st.Fingerprint)
 		cctx, cancel = w.call(ctx)
 		defer cancel()
@@ -576,18 +579,26 @@ func (w *Worker) file(ctx context.Context, st Staged) error {
 // its own address, and a title that is too long in bytes is cut at the
 // last whole character that fits.
 func filing(rec Record) muster.Filing {
-	title := rec.Title
+	title := strings.TrimSpace(rec.Title)
 	if title == "" {
 		title = rec.Address
 	}
-	if len(title) > muster.MaxTitle {
-		cut := muster.MaxTitle
-		for cut > 0 && !utf8.RuneStart(title[cut]) {
-			cut--
-		}
-		title = strings.TrimRight(title[:cut], " ")
+	title = cutUTF8(title, muster.MaxTitle)
+	if title == "" {
+		title = cutUTF8(rec.Address, muster.MaxTitle)
 	}
 	return muster.Filing{Source: rec.Source, Title: title, Address: rec.Address, Result: rec}
+}
+
+func cutUTF8(s string, maxBytes int) string {
+	if len(s) <= maxBytes {
+		return strings.TrimSpace(s)
+	}
+	cut := maxBytes
+	for cut > 0 && !utf8.RuneStart(s[cut]) {
+		cut--
+	}
+	return strings.TrimSpace(s[:cut])
 }
 
 // complete ends a lease.

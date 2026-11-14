@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trawl
+  namespace: cs-workers
+  labels:
+    app.kubernetes.io/name: trawl
+    app.kubernetes.io/part-of: clearedstack
+automountServiceAccountToken: false
+---
+# Default sources configuration. Empty by default so Trawl makes no
+# outbound source fetches until the operator configures public feeds.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trawl-sources
+  namespace: cs-workers
+  labels:
+    app.kubernetes.io/name: trawl
+    app.kubernetes.io/part-of: clearedstack
+data:
+  sources.json: |
+    {
+      "sources": []
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trawl
+  namespace: cs-workers
+  labels:
+    app.kubernetes.io/name: trawl
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: clearedstack
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trawl
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: trawl
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: clearedstack
+    spec:
+      serviceAccountName: trawl
+      # Muster authenticates Trawl with Kubernetes TokenReview against
+      # this pod's projected ServiceAccount token.
+      automountServiceAccountToken: true
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - arm64
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - cm3588-plus
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: trawl
+          # Built reproducibly with ko (.ko.yaml, base image pinned by
+          # digest) and pushed to Lazarette by Keelworks. Before Lazarette
+          # is deployed, this digest records the reproducible linux/arm64
+          # trawl binary SHA-256; Keelworks replaces it with the pushed
+          # OCI manifest digest in Lazarette before Shipkeeper applies it.
+          image: lazarette.clearedstack.svc.cluster.local:5000/trawl@sha256:85a420892f808384710c49ba2ee6a8c159a8b44aac04afa003b52b23e7346083
+          imagePullPolicy: IfNotPresent
+          args:
+            - work
+            - -muster-url
+            - http://muster.clearedstack.svc.cluster.local:8080
+            - -spool
+            - /var/spool/cs
+            - -sources
+            - /etc/trawl/sources.json
+          env:
+            - name: CONTRACT_VERSION
+              value: v1
+            - name: MUSTER_URL
+              value: http://muster.clearedstack.svc.cluster.local:8080
+            - name: TRAWL_SPOOL_DIR
+              value: /var/spool/cs
+            - name: TRAWL_SOURCES
+              value: /etc/trawl/sources.json
+            - name: GOMEMLIMIT
+              value: 24MiB
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 30Mi
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: spool
+              mountPath: /var/spool/cs
+            - name: sources
+              mountPath: /etc/trawl
+              readOnly: true
+      volumes:
+        # emptyDir survives container restarts on any arm64 worker node;
+        # swap for a PersistentVolumeClaim if node-reschedule spool
+        # persistence is provisioned.
+        - name: spool
+          emptyDir:
+            sizeLimit: 16Mi
+        - name: sources
+          configMap:
+            name: trawl-sources
+            defaultMode: 0444

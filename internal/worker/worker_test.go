@@ -18,6 +18,7 @@ import (
 
 	"github.com/ClearedStack/trawl/internal/errs"
 	"github.com/ClearedStack/trawl/internal/golden"
+	"github.com/ClearedStack/trawl/internal/intake"
 	"github.com/ClearedStack/trawl/internal/muster"
 	"github.com/ClearedStack/trawl/internal/spool"
 	"github.com/ClearedStack/trawl/internal/tool"
@@ -562,13 +563,25 @@ func TestSweepFailuresDoNotStopTheRest(t *testing.T) {
 	}
 }
 
-// TestRefusedFilingDoesNotStopTheBatch covers a candidate the hub will not
-// take: here an address longer than the hub allows.
+// TestRefusedFilingDoesNotStopTheBatch covers a candidate in a staged batch
+// that the hub will not take (for instance written before a rule tightened),
+// and verifies that Sweep now catches >2,000-byte addresses before filing.
 func TestRefusedFilingDoesNotStopTheBatch(t *testing.T) {
 	dir := t.TempDir()
 	r := newRig(t, dir)
 	long := "https://tools.agency-example.gov/" + strings.Repeat("a", muster.MaxAddress-30)
-	r.source(feedA, urls(wage, long, rates))
+	if _, err := r.worker.Spool.Append(Staged{
+		Kind:   KindFile,
+		Source: muster.SourceSAMGov,
+		Tool:   "list",
+		Candidates: []intake.Candidate{
+			{Address: wage},
+			{Address: long},
+			{Address: rates},
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
 	drain(t, r.worker)
 	clean(t, dir)
 	if items := r.hub.Items(); len(items) != 2 || items[0].Address != wage || items[1].Address != rates {
@@ -576,6 +589,16 @@ func TestRefusedFilingDoesNotStopTheBatch(t *testing.T) {
 	}
 	if !strings.Contains(r.logs.String(), `"msg":"filing_refused"`) || strings.Contains(r.logs.String(), "aaaa") {
 		t.Errorf("the refusal should be logged without the address:\n%s", r.logs.String())
+	}
+
+	// On a fresh sweep, normalize enforces Muster's 2,000-byte limit before
+	// staging, so Muster never receives the oversized filing at all.
+	r.logs.Reset()
+	r.source(feedA, urls(long))
+	drain(t, r.worker)
+	clean(t, dir)
+	if !strings.Contains(r.logs.String(), `"msg":"entry_refused"`) || !strings.Contains(r.logs.String(), `"reason":"too_long"`) || strings.Contains(r.logs.String(), "aaaa") {
+		t.Errorf("sweep should refuse >2,000-byte address at intake without logging it:\n%s", r.logs.String())
 	}
 }
 
@@ -841,5 +864,31 @@ func TestFormAddressTypedTwoWays(t *testing.T) {
 		if it := items[id]; it.State != muster.StateRecorded || record(it).Address != wage {
 			t.Errorf("%s = %+v", id, it)
 		}
+	}
+}
+
+func TestLeaseLostOnPausedEntryDoesNotCallFail(t *testing.T) {
+	dir := t.TempDir()
+	r := newRig(t, dir)
+	if _, err := r.worker.Spool.Append(Staged{
+		Kind:   KindNeedsSubtool,
+		Lease:  "PA-0099.9.1",
+		ItemID: "PA-0099",
+		Code:   errs.NeedsSubtool,
+		Reason: "idn_host",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.worker.Flush(context.Background()); err != nil {
+		t.Fatalf("Flush: %v", err)
+	}
+	clean(t, dir)
+	for _, call := range r.hub.Calls() {
+		if call.Path == "/v1/fail" {
+			t.Fatalf("a stale NeedsSubtool lease caused a /v1/fail call: %+v", call)
+		}
+	}
+	if !strings.Contains(r.logs.String(), `"msg":"lease_gone"`) {
+		t.Errorf("expected lease_gone in logs, got:\n%s", r.logs.String())
 	}
 }

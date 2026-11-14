@@ -292,18 +292,115 @@ func sendable(ex example) bool {
 	return true
 }
 
-// TestContractExamplesThroughClient drives Trawl's client with the
-// arguments of each saved example it can produce, and checks the request
-// it sends and the way it reads the answer.
+// otherCalls are the contract v1 calls that belong to callers other than
+// Trawl under CONTRACT.md ("Who may call what"). If a new example appears
+// in contract/v1/examples/ for a worker call Trawl makes, it is not in
+// this table and TestContractExamplesThroughClient fails unless Trawl's
+// client handles it.
+var otherCalls = map[string]struct {
+	method string
+	path   string
+	as     string
+}{
+	"release":              {http.MethodPost, "/v1/release", "countersign"},
+	"edits":                {http.MethodPost, "/v1/edits", "conn"},
+	"edits-honeypot":       {http.MethodPost, "/v1/edits", "conn"},
+	"items-site-form":      {http.MethodPost, "/v1/items", "conn"},
+	"health":               {http.MethodPost, "/v1/health", "shipkeeper"},
+	"health-replay":        {http.MethodPost, "/v1/health", "shipkeeper"},
+	"health-proposal-live": {http.MethodPost, "/v1/health", "shipkeeper"},
+	"feed":                 {http.MethodGet, "/v1/feed", "conn"},
+	"healthz":              {http.MethodGet, "/healthz", ""},
+}
+
+func checkRefusal(t *testing.T, ex example, err error) {
+	t.Helper()
+	var refusal *Refusal
+	status := ex.Expect.Status
+	if !errors.As(err, &refusal) || refusal.Status != status {
+		t.Fatalf("a %d was read as %v", status, err)
+	}
+	var want struct {
+		Error  errs.Code `json:"error"`
+		Cause  string    `json:"cause"`
+		Reason string    `json:"reason"`
+	}
+	if uerr := json.Unmarshal(ex.Expect.Body, &want); uerr != nil {
+		t.Fatalf("refusal body is not JSON: %v", uerr)
+	}
+	if refusal.Code != want.Error || refusal.Cause != want.Cause {
+		t.Errorf("refusal read as %+v, want %+v", refusal, want)
+	}
+	if want.Reason != "" && bytes.Contains([]byte(err.Error()), []byte(want.Reason)) {
+		t.Errorf("error %q repeats reason %q", err.Error(), want.Reason)
+	}
+	kind := ErrRefused
+	switch {
+	case status == http.StatusConflict:
+		kind = ErrConflict
+	case status == 401, status == 403, status == 429, status >= 500:
+		kind = ErrUnavailable
+	}
+	if !errors.Is(err, kind) {
+		t.Errorf("a %d %s was not sorted as %v", status, want.Cause, kind)
+	}
+}
+
+type fixedResponse struct {
+	status int
+	body   []byte
+}
+
+func (f fixedResponse) RoundTrip(*http.Request) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: f.status,
+		Header:     http.Header{"Content-Type": {"application/json"}},
+		Body:       io.NopCloser(bytes.NewReader(f.body)),
+	}, nil
+}
+
+// TestContractExamplesThroughClient replays every saved example from
+// contract/v1/examples/:
+//   - Calls Trawl's client can construct are driven end to end through
+//     *HTTP, checking exact request bytes and answer decoding.
+//   - Every refusal whose request Trawl's client prevents by construction
+//     still has its saved HTTP answer replayed through *HTTP to check
+//     refusal decoding, sanitization and classification.
+//   - Calls owned by other components under CONTRACT.md are checked
+//     against the caller table so no new worker example goes untested.
 func TestContractExamplesThroughClient(t *testing.T) {
 	examples := loadExamples(t)
+	for name := range otherCalls {
+		if _, ok := examples[name]; !ok {
+			t.Errorf("otherCalls lists %q, which is not among the examples", name)
+		}
+	}
 	replayed := map[string]int{}
+	checked := 0
 	for _, name := range sortedNames(examples) {
 		ex := examples[name]
-		if !sendable(ex) {
-			continue
-		}
+		checked++
 		t.Run(name, func(t *testing.T) {
+			if !sendable(ex) {
+				if ex.Expect.Status >= 400 {
+					c := client(t, "http://hub.made-up.svc", tokenFor("trawl"))
+					c.client.Transport = fixedResponse{status: ex.Expect.Status, body: ex.Expect.Body}
+					_, err := c.Lease(ctx)
+					checkRefusal(t, ex, err)
+					return
+				}
+				other, ok := otherCalls[name]
+				if !ok {
+					t.Fatalf("example %s (%s %s as %q) is neither sendable by Trawl's client nor listed in otherCalls",
+						name, ex.Request.Method, ex.Request.Path, ex.Request.As)
+				}
+				if ex.Request.Method != other.method || ex.Request.Path != other.path || ex.Request.As != other.as {
+					t.Errorf("example %s calls %s %s as %q, want %s %s as %q",
+						name, ex.Request.Method, ex.Request.Path, ex.Request.As, other.method, other.path, other.as)
+				}
+				return
+			}
+
 			rt := &answering{t: t, ex: ex}
 			c := client(t, "http://hub.made-up.svc", tokenFor("trawl"))
 			c.client.Transport = rt
@@ -373,41 +470,23 @@ func TestContractExamplesThroughClient(t *testing.T) {
 				t.Fatal("no request was made")
 			}
 
-			var refusal *Refusal
-			switch status := ex.Expect.Status; {
-			case status < 300:
+			if ex.Expect.Status < 300 {
 				if err != nil {
-					t.Errorf("a %d was read as %v", status, err)
+					t.Errorf("a %d was read as %v", ex.Expect.Status, err)
 				}
-			case !errors.As(err, &refusal) || refusal.Status != status:
-				t.Errorf("a %d was read as %v", status, err)
-			default:
-				var want struct {
-					Error errs.Code `json:"error"`
-					Cause string    `json:"cause"`
-				}
-				json.Unmarshal(ex.Expect.Body, &want)
-				if refusal.Code != want.Error || refusal.Cause != want.Cause {
-					t.Errorf("refusal read as %+v, want %+v", refusal, want)
-				}
-				kind := ErrRefused
-				switch {
-				case status == http.StatusConflict:
-					kind = ErrConflict
-				case status == 401, status == 403, status == 429, status >= 500:
-					kind = ErrUnavailable
-				}
-				if !errors.Is(err, kind) {
-					t.Errorf("a %d %s was not sorted as %v", status, want.Cause, kind)
-				}
+			} else {
+				checkRefusal(t, ex, err)
 			}
+			replayed[ex.Request.Path]++
 		})
-		replayed[ex.Request.Path]++
+	}
+	if checked != len(examples) {
+		t.Fatalf("checked %d examples, want %d", checked, len(examples))
 	}
 	for path := range clientFields {
 		if replayed[path] == 0 {
 			t.Errorf("no example of %s was replayed through the client", path)
 		}
 	}
-	t.Logf("replayed through the client, by call: %v", replayed)
+	t.Logf("verified all %d contract examples; request+answer replayed by call: %v", checked, replayed)
 }

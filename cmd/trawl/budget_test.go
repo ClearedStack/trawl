@@ -115,3 +115,42 @@ func TestWorkRefusesBadSettings(t *testing.T) {
 		}
 	}
 }
+
+func TestWorkReadsEnvironmentAndChecksContract(t *testing.T) {
+	t.Setenv("CONTRACT_VERSION", "v2")
+	var out, errOut strings.Builder
+	if status := run([]string{"work", "-muster-url", "http://hub.made-up.svc"}, strings.NewReader(""), &out, &errOut); status != 2 {
+		t.Fatalf("wrong CONTRACT_VERSION accepted: status %d", status)
+	}
+	t.Setenv("CONTRACT_VERSION", "v1")
+	t.Setenv("TRAWL_SWEEP_EVERY", "not-a-duration")
+	if status := run([]string{"work", "-muster-url", "http://hub.made-up.svc"}, strings.NewReader(""), &out, &errOut); status != 2 {
+		t.Fatalf("bad TRAWL_SWEEP_EVERY accepted: status %d", status)
+	}
+	t.Setenv("TRAWL_SWEEP_EVERY", "0s")
+
+	const token = "made-up-token-for-trawl"
+	hub := muster.NewFake(map[string]string{token: "trawl"})
+	hub.Seed(muster.FakeItem{State: muster.StateDiscovered, Next: "trawl", Source: "site-form", Title: "Wage calculator", Address: "https://tools.agency-example.gov/wage"})
+	srv := httptest.NewServer(hub)
+	defer srv.Close()
+
+	tokenFile := filepath.Join(t.TempDir(), "token")
+	if err := os.WriteFile(tokenFile, []byte(token+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	sourcesFile := filepath.Join(t.TempDir(), "sources.json")
+	if err := os.WriteFile(sourcesFile, []byte(`{"sources": []}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("MUSTER_URL", srv.URL)
+	t.Setenv("TRAWL_TOKEN_FILE", tokenFile)
+	t.Setenv("TRAWL_SPOOL_DIR", filepath.Join(t.TempDir(), "spool"))
+	t.Setenv("TRAWL_SOURCES", sourcesFile)
+	if status := run([]string{"work", "-drain"}, strings.NewReader(""), &out, &errOut); status != 0 {
+		t.Fatalf("work from environment failed with %d: %s", status, errOut.String())
+	}
+	if items := hub.Items(); len(items) != 1 || items[0].State != muster.StateRecorded {
+		t.Fatalf("items = %+v", items)
+	}
+}
